@@ -1,0 +1,13 @@
+# Non-secret settings. Environment variables override these (nested with "__",
+# e.g. LOGGING__LEVEL=DEBUG). Secrets (API keys) live only in the environment / .env.
+
+logging:
+  level: INFO          # DEBUG | INFO | WARNING | ERROR
+  format: json         # json | console
+  log_payloads: false  # true => questions/prompts logged at DEBUG
+
+# Later phases (not typed yet):
+# llm:        pinned model names, timeout_s, max_attempts, judge model (fixed)
+# embedding:  model name (collection name includes it)
+# retrieval:  k, rrf constant, rerank top-n
+# data:       source url, download date
