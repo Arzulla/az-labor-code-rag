@@ -23,7 +23,8 @@ from labor_code_rag.config import load_settings
 from labor_code_rag.errors import SourceDownloadError
 from labor_code_rag.logging_setup import configure_logging, set_request_id
 
-logger = logging.getLogger(__name__)
+# Explicit name: under `python -m` __name__ would be "__main__".
+logger = logging.getLogger("labor_code_rag.ingest.download")
 
 _USER_AGENT = "labor-code-rag/0.1 (+https://github.com/Arzulla/az-labor-code-rag)"
 
@@ -103,10 +104,13 @@ def download_source(
 
     raw_dir.mkdir(parents=True, exist_ok=True)
     html_path = raw_dir / name
+    meta_path = html_path.with_suffix(".meta.json")
+    # Drop the previous run's marker first, so a stale meta.json never sits next to new HTML.
+    meta_path.unlink(missing_ok=True)
     _write_atomic(html_path, result.body)
     # Second on purpose: meta.json is the "download complete" marker.
     _write_atomic(
-        html_path.with_suffix(".meta.json"),
+        meta_path,
         (meta.model_dump_json(indent=2) + "\n").encode("utf-8"),
     )
 
@@ -135,8 +139,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    # Under `python -m` this file runs as `__main__`; importing it again by its real name
-    # makes `logger` report "labor_code_rag.ingest.download" instead of "__main__".
-    from labor_code_rag.ingest.download import main as _main
-
-    _main()
+    main()

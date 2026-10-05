@@ -1,13 +1,23 @@
 import hashlib
 import json
 import logging
+import urllib.error
+import urllib.request
 from datetime import UTC, datetime
+from email.message import Message
 from pathlib import Path
 
 import pytest
 
 from labor_code_rag.errors import SourceDownloadError
-from labor_code_rag.ingest.download import Fetch, FetchResult, SourceMeta, download_source
+from labor_code_rag.ingest import download
+from labor_code_rag.ingest.download import (
+    Fetch,
+    FetchResult,
+    SourceMeta,
+    download_source,
+    urllib_fetch,
+)
 
 SOURCE_URL = "https://frameworks.e-qanun.az/46/f_46943.html"
 UI_URL = "https://e-qanun.az/framework/46943"
@@ -96,3 +106,44 @@ def test_logs_source_downloaded(tmp_path: Path, caplog: pytest.LogCaptureFixture
     assert record.sha256 == hashlib.sha256(BODY).hexdigest()
     assert record.last_modified == "Mon, 01 Sep 2026 10:00:00 GMT"
     assert isinstance(record.latency_ms, int)
+
+
+def test_failed_meta_write_leaves_no_stale_meta(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _download(tmp_path, FakeFetch(body=b"old"))
+    meta_path = tmp_path / "raw" / "f_46943.meta.json"
+    assert meta_path.exists()
+
+    real_write = download._write_atomic
+
+    def fail_on_meta(path: Path, data: bytes) -> None:
+        if path.name.endswith(".meta.json"):
+            raise OSError("disk full")
+        real_write(path, data)
+
+    monkeypatch.setattr(download, "_write_atomic", fail_on_meta)
+    with pytest.raises(OSError):
+        _download(tmp_path, FakeFetch())
+
+    # New HTML without a marker = incomplete download; the old marker must not survive.
+    assert (tmp_path / "raw" / "f_46943.html").read_bytes() == BODY
+    assert not meta_path.exists()
+
+
+def test_urllib_fetch_maps_http_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    def raise_http_error(*args: object, **kwargs: object) -> None:
+        raise urllib.error.HTTPError(SOURCE_URL, 403, "Forbidden", Message(), None)
+
+    monkeypatch.setattr(urllib.request, "urlopen", raise_http_error)
+    with pytest.raises(SourceDownloadError, match="HTTP 403"):
+        urllib_fetch(SOURCE_URL, 1.0)
+
+
+def test_urllib_fetch_maps_connection_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    def raise_url_error(*args: object, **kwargs: object) -> None:
+        raise urllib.error.URLError("connection refused")
+
+    monkeypatch.setattr(urllib.request, "urlopen", raise_url_error)
+    with pytest.raises(SourceDownloadError, match="cannot reach"):
+        urllib_fetch(SOURCE_URL, 1.0)
