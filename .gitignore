@@ -7,7 +7,7 @@ __pycache__/
 .pytest_cache/
 dist/
 chroma/
-data/raw/
+data/
 .cache/
 .DS_Store
 .claude/settings.local.json

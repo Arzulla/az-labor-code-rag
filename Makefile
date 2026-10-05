@@ -7,7 +7,7 @@ setup:
 	uv sync
 
 data:
-	@echo "make data: not implemented yet (Phase 1)"; exit 1
+	uv run python -m labor_code_rag.ingest.download
 
 ingest:
 	@echo "make ingest: not implemented yet (Phase 1)"; exit 1

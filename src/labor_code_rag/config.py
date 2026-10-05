@@ -20,6 +20,14 @@ class LoggingSettings(BaseModel):
     log_payloads: bool = False
 
 
+class DataSettings(BaseModel):
+    # URLs have no defaults on purpose: config.yaml is their single source of truth.
+    source_url: str
+    ui_url: str
+    raw_dir: Path = Path("data/raw")
+    download_timeout_s: float = 60.0
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_nested_delimiter="__",
@@ -28,6 +36,7 @@ class Settings(BaseSettings):
     )
 
     logging: LoggingSettings = LoggingSettings()
+    data: DataSettings | None = None  # required only by the ingest steps
 
     @classmethod
     def settings_customise_sources(

@@ -80,7 +80,7 @@ every call and saved in every eval result.
 - Pydantic models across boundaries: `Article`, `Chunk`, `RetrievedChunk`, `Answer`,
   `Citation`, `GoldenItem`, `EvalResult`.
 - No `print` in `src/`. Exceptions: `LaborCodeRagError` → `RetrievalError`, `LLMError`,
-  `ParseError`. Catch specific exceptions; never swallow silently.
+  `SourceDownloadError`, `ParseError`. Catch specific exceptions; never swallow silently.
 - Embeddings cached by `(embedding_model, sha256(chunk_text))`.
 - **Azerbaijani text (important):**
   - Normalize all text to Unicode **NFC** at ingest and query time.
