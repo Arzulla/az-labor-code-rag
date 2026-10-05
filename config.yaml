@@ -6,8 +6,14 @@ logging:
   format: json         # json | console
   log_payloads: false  # true => questions/prompts logged at DEBUG
 
+data:
+  # Official consolidated Labor Code (e-qanun.az). Download date goes to the .meta.json.
+  source_url: https://frameworks.e-qanun.az/46/f_46943.html
+  ui_url: https://e-qanun.az/framework/46943
+  raw_dir: data/raw
+  download_timeout_s: 60
+
 # Later phases (not typed yet):
 # llm:        pinned model names, timeout_s, max_attempts, judge model (fixed)
 # embedding:  model name (collection name includes it)
 # retrieval:  k, rrf constant, rerank top-n
-# data:       source url, download date

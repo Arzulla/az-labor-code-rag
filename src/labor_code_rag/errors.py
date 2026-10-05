@@ -13,5 +13,9 @@ class LLMError(LaborCodeRagError):
     """An LLM or embedding call failed."""
 
 
+class SourceDownloadError(LaborCodeRagError):
+    """The official law text could not be downloaded."""
+
+
 class ParseError(LaborCodeRagError):
     """The law text could not be parsed into articles."""
