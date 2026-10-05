@@ -90,7 +90,7 @@ hər konfiqurasiya ən az 2 dəfə; golden set nəticəni yaxşılaşdırmaq ü�
 
 ## Mərhələlər
 
-- [ ] **0. Scaffolding:** struktur, config, logging, lint, test
+- [x] **0. Scaffolding:** struktur, config, logging, lint, test
 - [ ] **1. Data:** mənbə və istifadə şərtləri, parse, maddə chunking, testlər (~5 saat)
 - [ ] **2. Baseline:** yalnız vector search (1 encoder) + cavab + istinad + sadə UI (~4 saat)
 - [ ] **3. Golden set + eval:** 60-80 sual, baseline nəticəsi (~6 saat)
