@@ -38,4 +38,11 @@ index:
 retrieval:
   k: 8
 
+eval:
+  golden_dir: eval/golden          # dev.jsonl, test.jsonl (ADR-006)
+  results_dir: eval/results        # one JSON per run, committed (CLAUDE.md §10)
+  calibration_path: eval/calibration.jsonl
+  calibration_n: 15                # dev answers for judge-vs-human calibration (ADR-007)
+  max_cost_usd: 1.00               # budget guard per run: stop when cumulative cost exceeds it
+
 # Later phases (not typed yet): retrieval.rrf_k, rerank top-n

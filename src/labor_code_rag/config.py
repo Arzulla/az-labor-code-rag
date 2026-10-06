@@ -67,6 +67,15 @@ class RetrievalSettings(BaseModel):
     k: int = Field(default=8, ge=1)
 
 
+class EvalSettings(BaseModel):
+    golden_dir: Path = Path("eval/golden")
+    results_dir: Path = Path("eval/results")
+    calibration_path: Path = Path("eval/calibration.jsonl")
+    calibration_n: int = Field(default=15, ge=1)
+    # Budget guard: a run stops once its cumulative cost (answers + judge) exceeds this.
+    max_cost_usd: float = Field(default=1.00, gt=0)
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_nested_delimiter="__",
@@ -79,6 +88,7 @@ class Settings(BaseSettings):
     llm: LLMSettings | None = None  # required by index, retrieval and generation
     index: IndexSettings = IndexSettings()
     retrieval: RetrievalSettings = RetrievalSettings()
+    eval: EvalSettings = EvalSettings()
     # Secret: from the OPENAI_API_KEY env var / .env only (load_settings rejects it in YAML).
     # SecretStr keeps it out of repr() and logs.
     openai_api_key: SecretStr | None = None
