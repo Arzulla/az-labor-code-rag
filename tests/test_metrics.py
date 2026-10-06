@@ -84,6 +84,9 @@ def test_citation_point_rules() -> None:
     assert citation_correct_point(ref("70"), gold)
     assert not citation_correct_point(ref("114"), gold)  # article-only cannot hit 114.2
     assert not citation_correct_point(ref("114", "3"), gold)
+    # Format error: article "70.1" is wrong at both levels, even though "70" is gold.
+    assert not citation_correct_point(ref("70.1"), gold)
+    assert not citation_correct_point(ref("114.2", "1"), ["114.2"])
 
 
 def test_citation_precision_pooled_and_article_only_share() -> None:

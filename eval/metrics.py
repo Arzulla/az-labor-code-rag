@@ -81,6 +81,17 @@ def chunk_recall(retrieved_chunk_ids: Sequence[str], relevant_chunks: Iterable[s
 # --- Citations ------------------------------------------------------------------------------
 
 
+def invalid_kind(ref: ArticleRef) -> Literal["format", "not_retrieved"]:
+    """Why a citation failed the retrieved-set check (``citations.py``).
+
+    ``format``: the structured ``article_no`` carries a point (``"254.1"``), so the ref
+    reads ``Maddə 254.1.1`` and can never match an article; a formatting bug of the answer
+    model, not a hallucination. Text-parsed refs never look like this (the parser splits
+    article and point). ``not_retrieved``: a well-formed ref to something not retrieved.
+    """
+    return "format" if "." in ref.article else "not_retrieved"
+
+
 def citation_correct_article(ref: ArticleRef, relevant_chunks: Iterable[str]) -> bool:
     """Article-level hit: the cited article is one of the gold articles."""
     return ref.article in {article_of(c) for c in relevant_chunks}
@@ -92,8 +103,12 @@ def citation_correct_point(ref: ArticleRef, relevant_chunks: Iterable[str]) -> b
     ``Maddə N.P`` hits if chunk ``N.<top-level part of P>`` is gold (``114.2.1`` lives in
     chunk ``114.2``) or if article N is gold as one whole chunk ``N`` (no points to be more
     precise about). ``Maddə N`` without a point hits only if chunk ``N`` itself is gold.
+    A format error (article ``"254.1"``) is a miss, as at article level, so point hits stay
+    a subset of article hits.
     """
     gold = set(relevant_chunks)
+    if invalid_kind(ref) == "format":  # "254.1" as article: wrong at every level
+        return False
     if ref.point is None:
         return ref.article in gold
     top_point = ref.point.split(".")[0]
@@ -123,17 +138,6 @@ def article_only_share(refs: Sequence[ArticleRef]) -> float | None:
     Explains a low point-level precision: ``Maddə 114`` cannot hit gold chunk ``114.2``.
     """
     return sum(ref.point is None for ref in refs) / len(refs) if refs else None
-
-
-def invalid_kind(ref: ArticleRef) -> Literal["format", "not_retrieved"]:
-    """Why a citation failed the retrieved-set check (``citations.py``).
-
-    ``format``: the structured ``article_no`` carries a point (``"254.1"``), so the ref
-    reads ``Maddə 254.1.1`` and can never match an article; a formatting bug of the answer
-    model, not a hallucination. Text-parsed refs never look like this (the parser splits
-    article and point). ``not_retrieved``: a well-formed ref to something not retrieved.
-    """
-    return "format" if "." in ref.article else "not_retrieved"
 
 
 def rate(hits: int, total: int) -> float | None:
