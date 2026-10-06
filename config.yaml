@@ -11,6 +11,7 @@ data:
   source_url: https://frameworks.e-qanun.az/46/f_46943.html
   ui_url: https://e-qanun.az/framework/46943
   raw_dir: data/raw
+  processed_dir: data/processed  # chunks.jsonl (make ingest)
   download_timeout_s: 60
 
 # Later phases (not typed yet):
