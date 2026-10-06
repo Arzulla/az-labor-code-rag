@@ -11,6 +11,7 @@ from eval.metrics import (
     citation_precision,
     dedup_ranked,
     exact_agreement,
+    invalid_kind,
     mean,
     percentile,
     precision_at_k,
@@ -205,3 +206,37 @@ def test_summarize_retrieval_only_has_no_answer_metrics() -> None:
     assert m["mrr"] == 1.0
     assert "false_refusal_rate" not in m
     assert "judge_accuracy" not in m
+
+
+def test_invalid_citations_split_into_format_and_not_retrieved() -> None:
+    # The answer model put the chunk id into article_no: article "254.1", point "1".
+    format_error = ref("254.1", "1")
+    assert invalid_kind(format_error) == "format"
+    assert invalid_kind(ref("250")) == "not_retrieved"
+    assert invalid_kind(ref("254", "1")) == "not_retrieved"
+
+    def answered(id_: str, cited: list[ArticleRef], invalid: list[ArticleRef]) -> EvalItemResult:
+        return _item(
+            id=id_,
+            category="factual",
+            relevant_chunks=["114.1"],
+            retrieved_chunk_ids=["114.1"],
+            retrieved_article_nos=["114"],
+            answer="x",
+            refused=False,
+            cited=cited,
+            invalid_citations=invalid,
+            judge=JudgeScore(accuracy=5, completeness=5, relevance=5, rationale="ok"),
+        )
+
+    items = [
+        answered("a", [ref("114", "1"), format_error, ref("250")], [format_error, ref("250")]),
+        answered("b", [ref("114", "1")], []),
+    ]
+    m = summarize(items, k_chunks=8)
+    # 4 cited refs in total: 1 format error, 1 well-formed but not retrieved.
+    assert m["cited_n"] == 4
+    assert m["invalid_citation_rate"] == 0.5
+    assert m["invalid_format_rate"] == 0.25
+    assert m["invalid_not_retrieved_rate"] == 0.25
+    assert m["answers_with_format_error_n"] == 1

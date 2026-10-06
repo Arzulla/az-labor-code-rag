@@ -125,6 +125,17 @@ def article_only_share(refs: Sequence[ArticleRef]) -> float | None:
     return sum(ref.point is None for ref in refs) / len(refs) if refs else None
 
 
+def invalid_kind(ref: ArticleRef) -> Literal["format", "not_retrieved"]:
+    """Why a citation failed the retrieved-set check (``citations.py``).
+
+    ``format``: the structured ``article_no`` carries a point (``"254.1"``), so the ref
+    reads ``Maddə 254.1.1`` and can never match an article; a formatting bug of the answer
+    model, not a hallucination. Text-parsed refs never look like this (the parser splits
+    article and point). ``not_retrieved``: a well-formed ref to something not retrieved.
+    """
+    return "format" if "." in ref.article else "not_retrieved"
+
+
 def rate(hits: int, total: int) -> float | None:
     """hits / total; None when total is 0 (e.g. invalid citations / all citations)."""
     return hits / total if total else None
@@ -210,8 +221,9 @@ def summarize(items: Sequence[EvalItemResult], k_chunks: int) -> dict[str, float
     - Retrieval: in-scope items only (MRR, Recall@k, Precision@k, ChunkRecall@k_chunks).
     - Refusals: oos_refusal_rate over out_of_scope items (want high); false_refusal_rate
       over in-scope items (want low).
-    - Citations: invalid rate over every answered item; gold precision and article-only
-      share over answered in-scope items.
+    - Citations: invalid rate over every answered item, split into format errors and
+      well-formed refs that were not retrieved (both / all cited refs); gold precision and
+      article-only share over answered in-scope items.
     - Judge: means over in-scope items (refusals scored 1 without a call) and over judged
       (answered) items only.
     - Ops: latency p50/p95, mean and total cost.
@@ -246,8 +258,12 @@ def summarize(items: Sequence[EvalItemResult], k_chunks: int) -> dict[str, float
     answered_in_scope = [i for i in answered if i.category != "out_of_scope"]
     all_refs = [ref for i in answered for ref in i.cited]
     m["cited_n"] = float(len(all_refs))
-    m["invalid_citation_rate"] = rate(
-        sum(len(i.invalid_citations) for i in answered), len(all_refs)
+    invalid = [invalid_kind(ref) for i in answered for ref in i.invalid_citations]
+    m["invalid_citation_rate"] = rate(len(invalid), len(all_refs))
+    m["invalid_format_rate"] = rate(invalid.count("format"), len(all_refs))
+    m["invalid_not_retrieved_rate"] = rate(invalid.count("not_retrieved"), len(all_refs))
+    m["answers_with_format_error_n"] = float(
+        sum(any(invalid_kind(r) == "format" for r in i.invalid_citations) for i in answered)
     )
     pairs = [(i.cited, i.relevant_chunks) for i in answered_in_scope]
     m["citation_precision_article"] = citation_precision(pairs, "article")
