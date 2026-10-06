@@ -1,6 +1,7 @@
 """Pydantic models shared across module boundaries (CLAUDE.md §6)."""
 
 from datetime import datetime
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
@@ -83,3 +84,110 @@ class AnswerResult(BaseModel):
     invalid_citations: list[ArticleRef]  # cited but not retrieved (logged as citation.invalid)
     latency_ms: int
     cost_usd: float
+
+
+# --- Evaluation (Phase 3, ADR-006 / ADR-007) -----------------------------------------------
+
+Category = Literal["factual", "exact_article", "colloquial", "multi_article", "out_of_scope"]
+CATEGORIES: tuple[Category, ...] = (
+    "factual",
+    "exact_article",
+    "colloquial",
+    "multi_article",
+    "out_of_scope",
+)
+
+
+def article_of(chunk_id: str) -> str:
+    """Article number of a chunk id: ``"114.2"`` -> ``"114"``, ``"7-1.1"`` -> ``"7-1"``."""
+    return chunk_id.split(".", 1)[0]
+
+
+class GoldenItem(BaseModel):
+    """One golden-set question. Article-level relevance is derived from ``relevant_chunks``."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    id: str  # "fact-01"; unique across splits
+    question: str  # Azerbaijani, as a user would ask it
+    expected_answer: str  # short Azerbaijani reference answer with "Maddə N.P" refs
+    relevant_chunks: list[str]  # chunk ids ("114.2", "70"); empty for out_of_scope
+    category: Category
+    verified: bool = False  # set to true only by the owner, after checking against the law
+    notes: str = ""
+
+    @model_validator(mode="after")
+    def _out_of_scope_has_no_chunks(self) -> "GoldenItem":
+        if (self.category == "out_of_scope") != (not self.relevant_chunks):
+            raise ValueError(f"{self.id}: out_of_scope <=> empty relevant_chunks")
+        return self
+
+    @property
+    def relevant_articles(self) -> list[str]:
+        """Article numbers of ``relevant_chunks``, deduplicated, order kept."""
+        return list(dict.fromkeys(article_of(c) for c in self.relevant_chunks))
+
+
+Score = Literal[1, 2, 3, 4, 5]
+
+
+class JudgeScore(BaseModel):
+    """Structured output of the LLM judge (rubric in ``generation/prompts.py``)."""
+
+    accuracy: Score
+    completeness: Score
+    relevance: Score
+    rationale: str
+
+
+class EvalItemResult(BaseModel):
+    """Per-question details saved in every eval result file."""
+
+    id: str
+    category: Category
+    question: str
+    relevant_chunks: list[str]
+    request_id: str
+    retrieved_chunk_ids: list[str]  # rank order
+    retrieved_article_nos: list[str]  # rank order, deduplicated (first occurrence)
+    answer: str | None = None  # None in --retrieval-only runs
+    refused: bool | None = None
+    cited: list[ArticleRef] = []  # every ref in the answer (text + structured list)
+    invalid_citations: list[ArticleRef] = []  # cited but not retrieved (citations.py)
+    judge: JudgeScore | None = None
+    judge_skipped: Literal["out_of_scope", "refused"] | None = None
+    latency_ms: int
+    cost_usd: float  # answer pipeline + judge call
+
+
+class GoldenVerified(BaseModel):
+    verified_n: int
+    total_n: int
+
+
+class EvalResult(BaseModel):
+    """One eval run, written to ``eval/results/<UTC timestamp>_<label>_<split>.json``."""
+
+    label: str
+    split: Literal["dev", "test"]
+    created_at: datetime
+    git_sha: str
+    git_dirty: bool
+    config: dict[str, Any]  # settings snapshot, secrets excluded
+    prompt_version: str
+    judge_prompt_version: str
+    embedding_model: str
+    answer_model: str
+    judge_model: str
+    k: int
+    retrieval_only: bool
+    golden_file: str
+    golden_sha256: str
+    golden_verified: GoldenVerified
+    metrics: dict[str, float | None]
+    metrics_by_category: dict[str, dict[str, float | None]]
+    items: list[EvalItemResult]
+    total_cost_usd: float
+    wall_time_s: float
+    budget_exceeded: bool
+    stopped_reason: str | None  # "budget_exceeded" or an error; None for a complete run

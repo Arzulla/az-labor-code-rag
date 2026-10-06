@@ -42,11 +42,12 @@ known-local-folder = ["conftest"]  # tests/conftest.py helpers, imported by test
 [tool.mypy]
 python_version = "3.12"
 strict = true
-files = ["src"]
+files = ["src", "eval"]
 plugins = ["pydantic.mypy"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]  # the eval/ package (python -m eval.run_eval)
 addopts = "-m 'not integration'"
 markers = ["integration: hits real external APIs (skipped by default)"]
 # Chroma warns about its own stored config when embedding_function=None (we embed ourselves).

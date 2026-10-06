@@ -65,7 +65,8 @@ QUERY:   question
 ## Eval planı
 
 **Golden set** (`eval/golden/*.jsonl`), hər sətir:
-`{id, question, expected_answer, relevant_articles, category}`
+`{id, question, expected_answer, relevant_chunks, category, verified, notes}` (ADR-006;
+maddə səviyyəsi `relevant_chunks`-dan çıxarılır)
 
 | Kateqoriya | Nümunə |
 |---|---|
@@ -93,7 +94,7 @@ hər konfiqurasiya ən az 2 dəfə; golden set nəticəni yaxşılaşdırmaq ü�
 - [x] **0. Scaffolding:** struktur, config, logging, lint, test
 - [x] **1. Data:** mənbə və istifadə şərtləri, parse, maddə chunking, testlər (~5 saat)
 - [x] **2. Baseline:** yalnız vector search (1 encoder) + cavab + istinad + sadə UI (~4 saat)
-- [ ] **3. Golden set + eval:** 60-80 sual, baseline nəticəsi (~6 saat)
+- [x] **3. Golden set + eval:** 67 sual, baseline nəticəsi (~6 saat) — ADR-006, ADR-007
 - [ ] **4. Eksperimentlər:** encoder müqayisəsi → hybrid → rerank → rewriting, hər biri ayrıca (~7 saat)
 - [ ] **5. Grounding:** citation yoxlaması, refusal, injection testləri (~3 saat)
 - [ ] **6. Təhvil:** README, ablation cədvəli, GIF demo, Docker, deploy (~4 saat)
@@ -222,4 +223,75 @@ Format: **Qərar → Alternativlər → Niyə → Ölçülən nəticə.**
   tutmur; "qovdular" — danışıq dili; hamilə → 79.1 yox, 240–245). Model kontekstdən kənara
   çıxmadı. Bu, Phase 4 (BM25/hybrid, query rewriting, maddə nömrəsi ilə birbaşa lookup) üçün
   əsas motivasiyadır; rəqəmlər Phase 3-də golden set ilə ölçüləcək.
+
+### ADR-006: Golden set: 67 sual, chunk səviyyəsində gold, sahib tərəfindən yoxlanılır, sonra dondurulur
+- Qərar:
+  - `eval/golden/{dev,test}.jsonl`, **67 item**: factual 21, colloquial 15, exact_article 10,
+    multi_article 11, out_of_scope 10 (8 HR/hüquqi, amma başqa qanun: vergi, pensiya, işsizlik
+    sığortası, MMC qeydiyyatı, iş icazəsi rüsumu, kirayə, minimum əmək haqqının **məbləği**;
+    2 tamamilə kənar sual). `follow_up` atlanıb: sistem single-turn-dür, kontekst ötürülmür;
+    multi-turn gələcək iş kimi qalır.
+  - Gold vahidi **chunk**-dır (`relevant_chunks: ["114.2"]`), çünki istinadlar bənd
+    səviyyəsindədir (ADR-003); maddə səviyyəsi ondan çıxarılır, iki dəfə saxlanılmır. Gold =
+    tam cavab üçün lazım olan minimal chunk dəsti; faydalı, amma vacib olmayan chunk-lar
+    `notes`-dadır.
+  - Split: kateqoriya üzrə stratified, **seed 20261006**, ~55/45 → dev 38 / test 29; heç bir
+    eval run-dan əvvəl təyin olunub. `eval/split.py` + test faylların bu bölgüyə uyğunluğunu yoxlayır.
+  - Yazılma qaydası: `chunks.jsonl`-dan chunk seçilib, sual və cavab həmin mətndən yazılıb;
+    **retriever heç vaxt işə salınmayıb** (əks halda set baseline-ın artıq tapdığına doğru
+    əyilərdi). 13 bölmədən 12-si əhatə olunub (XIII yoxdur), III və V bölmələrə ağırlıq var.
+    Testlər: ID unikallığı, split-lər arasında sual təkrarı yoxdur, hər gold chunk `chunks.jsonl`-da var.
+  - Draft LLM (Claude) tərəfindən yazılıb, hamısı `verified: false`. `verified: true`-nu yalnız
+    sahib qoyur. Yoxlanılmamış set üzərində nəticələrin label-inə `_unverified` əlavə olunur,
+    README cədvəli "provisional" kimi işarələnir. Yoxlamadan sonra set **dondurulur**: dəyişiklik
+    üçün ADR + `make baseline` lazımdır (`golden_sha256` hər nəticədə; `make compare` fərqli
+    golden-də xəbərdarlıq edir).
+- Alternativlər: maddə səviyyəsində gold (sadə, amma `Maddə 114.2` dəqiqliyini ölçmür; coll-08/09
+  kimi "maddə tapıldı, bənd yox" halları görünməz qalır); golden set-i retriever nəticələrindən
+  qurmaq (sürətli, amma bias); 100+ sual (yoxlama yükü sahibin vaxtına sığmır); test-i ayrıca
+  yazmaq (eyni müəllif, eyni üslub; seed-li split daha şəffafdır).
+- Niyə: LLM-in yazdığı golden set ancaq sahib yoxladıqdan sonra "həqiqət" olur: model qanunu
+  səhv oxuya, gold-u natamam seçə bilər; yoxlanılmamış rəqəm eval-ı yox, LLM-in fikrini ölçür.
+- Ölçülən nəticə (baseline, provisional): dev MRR **0.525**, Recall@5 0.635, ChunkRecall@8
+  0.536; ən zəif kateqoriya colloquial (dev MRR 0.226, false-refusal ~0.56). Retrieval
+  deterministikdir: iki dev run arasında retrieval metriklərinin fərqi 0.000; generasiya
+  metriklərində fərq var (false-refusal 0.250 / 0.312), yəni ±0.06 noise-dur.
+
+### ADR-007: LLM judge: sabit model, temperature=0, chunk-ları görmür, insan balları ilə kalibrasiya
+- Qərar:
+  - Judge `gpt-4.1-2025-04-14` (ADR-004, SABİT), `temperature=0`, yalnız `llm.py` ilə, structured
+    output `JudgeScore {accuracy, completeness, relevance: 1-5, rationale}`. Prompt
+    `generation/prompts.py`-da, `JUDGE_PROMPT_VERSION = "judge-v1"`, hər nəticədə saxlanılır.
+    Rubric ingiliscədir (evaluator təlimatıdır, istifadəçiyə göstərilmir), hər bal üçün bir
+    sətirlik anchor; "yalnız reference-ə görə qiymətləndir, öz hüquqi biliyindən istifadə etmə";
+    input-lar delimiter-lərdə, escape olunub, içindəki göstərişlərə əməl edilmir.
+  - Judge **retrieve olunmuş chunk-ları görmür**: o, istifadəçinin oxuduğu cavabı reference ilə
+    müqayisə edir. Grounding ayrıca ölçülür (citation metrikləri).
+  - Skip: out_of_scope (refusal metriki ölçür); rədd edilmiş in-scope cavab — çağırış olmadan
+    1/1/1. İki orta göstərilir: bütün in-scope (refusal = 1) və yalnız cavablandırılmış.
+  - Kalibrasiya: `eval/calibration.jsonl` — dev-dən 15 judge olunmuş cavab, kateqoriyalar üzrə
+    round-robin, seed-li; `human_accuracy` boş, yalnız sahib doldurur. `make calibrate`:
+    exact agreement, ±1 agreement, Spearman (tie-lər üçün average rank; əl ilə yazılıb).
+    `eval/report.py` yenidən run olunanda, id və cavab mətni dəyişməyibsə, insan balını saxlayır.
+- Alternativlər: judge-a chunk-ları vermək (faithfulness ölçər, amma retrieval səhvini cavab
+  keyfiyyəti ilə qarışdırar və judge "kontekstdə var" deyə səhv cavabı bəyənə bilər); başqa
+  provider-dən judge (self-preference bias azalardı, amma ikinci açar/SDK, ADR-004); reference-siz
+  judge (öz biliyinə əsaslanar — hüquqi sualda yoxlanıla bilməz); refused cavabları da judge-a
+  göndərmək (pul və noise, nəticə məlumdur); 1-10 şkala (anchor-lar zəifləyir).
+- Niyə: reference-ə əsaslanan, anchor-lu, deterministik judge reproducible-dir; eyni ailədən olduğu
+  üçün (risk ADR-004) rəqəmlər ancaq insan kalibrasiyasından sonra etibarlıdır.
+- Ölçülən nəticə (baseline, provisional): judge accuracy dev **3.20** (refusal = 1 daxil),
+  cavablandırılmış cavablarda **4.07**; test 3.36 / 4.28. Judge çağırışı sorğu başına ~$0.002
+  xərcin təxminən yarısıdır. Kalibrasiya: **pending** (insan balları boşdur).
+- Açıq məsələ (Phase 4/5, bu fazada düzəldilmir): **citation format xətası.** Cavab modeli bəzən
+  structured `article_no`-ya chunk id yazır (`article_no: "254.1", point: "1"` → `Maddə 254.1.1`),
+  belə istinad heç vaxt maddəyə uyğun gəlmir. Bütün etibarsız istinadlar bu növdəndir
+  (`invalid_not_retrieved_rate` = 0, yəni model kontekstdən kənar maddə uydurmayıb); format xətası
+  olan cavablar: dev 3/22 və 4/24 cavablandırılmış, test 5/18. Metriklər bunu ayrıca göstərir
+  (`invalid_format_rate`) və gold precision-da həm maddə, həm bənd səviyyəsində səhv sayır.
+  Ehtimal olunan düzəliş: `Citation.article_no`-ya pattern `^\d+(-\d+)?$` + prompt-da nümunə —
+  ayrıca eksperiment kimi ölçülməlidir.
+- Digər müşahidə: fact-15-də gold maddə (249) retrieve olunmayıb, model 248-dən səhv nəticə
+  çıxarıb ("18 yaşdan az... məhdudiyyət yoxdur"); istinad "etibarlı" sayılır, judge accuracy = 1.
+  Citation yoxlaması (retrieved set) grounding-in yalnız bir hissəsini tutur.
 

@@ -1,0 +1,1580 @@
+{
+  "label": "baseline_unverified",
+  "split": "test",
+  "created_at": "2026-10-06T12:03:59.267520Z",
+  "git_sha": "148e5d98a43845c02a9bd12a6ff39f58ab9e54b7",
+  "git_dirty": false,
+  "config": {
+    "logging": {
+      "level": "INFO",
+      "format": "json",
+      "log_payloads": false
+    },
+    "data": {
+      "source_url": "https://frameworks.e-qanun.az/46/f_46943.html",
+      "ui_url": "https://e-qanun.az/framework/46943",
+      "raw_dir": "data/raw",
+      "processed_dir": "data/processed",
+      "download_timeout_s": 60.0
+    },
+    "llm": {
+      "base_url": "https://api.openai.com/v1",
+      "embedding_model": "text-embedding-3-small",
+      "answer_model": "gpt-4.1-mini-2025-04-14",
+      "judge_model": "gpt-4.1-2025-04-14",
+      "timeout_s": 30.0,
+      "max_attempts": 4,
+      "embed_batch_size": 128,
+      "prices_usd_per_1m": {
+        "text-embedding-3-small": {
+          "input": 0.02,
+          "output": 0.0
+        },
+        "gpt-4.1-mini-2025-04-14": {
+          "input": 0.4,
+          "output": 1.6
+        },
+        "gpt-4.1-2025-04-14": {
+          "input": 2.0,
+          "output": 8.0
+        }
+      }
+    },
+    "index": {
+      "chroma_dir": "data/chroma",
+      "cache_path": "data/cache/embeddings.sqlite",
+      "collection_prefix": "labor_code"
+    },
+    "retrieval": {
+      "k": 8
+    },
+    "eval": {
+      "golden_dir": "eval/golden",
+      "results_dir": "eval/results",
+      "calibration_path": "eval/calibration.jsonl",
+      "calibration_n": 15,
+      "max_cost_usd": 1.0
+    }
+  },
+  "prompt_version": "answer-v1",
+  "judge_prompt_version": "judge-v1",
+  "embedding_model": "text-embedding-3-small",
+  "answer_model": "gpt-4.1-mini-2025-04-14",
+  "judge_model": "gpt-4.1-2025-04-14",
+  "k": 8,
+  "retrieval_only": false,
+  "golden_file": "eval/golden/test.jsonl",
+  "golden_sha256": "194f67dab0ab2bb5c486fc4b77b4f9df655d993338c335a053eceb2885a88f16",
+  "golden_verified": {
+    "verified_n": 0,
+    "total_n": 29
+  },
+  "metrics": {
+    "n": 29.0,
+    "retrieval_n": 25.0,
+    "mrr": 0.5183333333333333,
+    "recall@1": 0.38,
+    "recall@3": 0.6,
+    "recall@5": 0.6,
+    "recall@8": 0.62,
+    "precision@1": 0.4,
+    "precision@3": 0.21333333333333332,
+    "precision@5": 0.128,
+    "precision@8": 0.085,
+    "chunk_recall@8": 0.54,
+    "oos_refusal_rate": 1.0,
+    "false_refusal_rate": 0.28,
+    "cited_n": 28.0,
+    "invalid_citation_rate": 0.17857142857142858,
+    "invalid_format_rate": 0.17857142857142858,
+    "invalid_not_retrieved_rate": 0.0,
+    "answers_with_format_error_n": 5.0,
+    "citation_precision_article": 0.5357142857142857,
+    "citation_precision_point": 0.4642857142857143,
+    "article_only_citation_share": 0.10714285714285714,
+    "judge_n": 18.0,
+    "judge_skipped_refused_n": 7.0,
+    "judge_accuracy": 3.36,
+    "judge_accuracy_answered": 4.277777777777778,
+    "judge_completeness": 3.24,
+    "judge_completeness_answered": 4.111111111111111,
+    "judge_relevance": 3.84,
+    "judge_relevance_answered": 4.944444444444445,
+    "latency_p50_ms": 1761.0,
+    "latency_p95_ms": 2796.0,
+    "cost_mean_usd": 0.002160618620689655,
+    "cost_total_usd": 0.06265794
+  },
+  "metrics_by_category": {
+    "factual": {
+      "n": 9.0,
+      "retrieval_n": 9.0,
+      "mrr": 0.7592592592592592,
+      "recall@1": 0.6666666666666666,
+      "recall@3": 0.8888888888888888,
+      "recall@5": 0.8888888888888888,
+      "recall@8": 0.8888888888888888,
+      "precision@1": 0.6666666666666666,
+      "precision@3": 0.2962962962962963,
+      "precision@5": 0.17777777777777778,
+      "precision@8": 0.1111111111111111,
+      "chunk_recall@8": 0.7222222222222222,
+      "oos_refusal_rate": null,
+      "false_refusal_rate": 0.2222222222222222,
+      "cited_n": 9.0,
+      "invalid_citation_rate": 0.3333333333333333,
+      "invalid_format_rate": 0.3333333333333333,
+      "invalid_not_retrieved_rate": 0.0,
+      "answers_with_format_error_n": 3.0,
+      "citation_precision_article": 0.5555555555555556,
+      "citation_precision_point": 0.5555555555555556,
+      "article_only_citation_share": 0.2222222222222222,
+      "judge_n": 7.0,
+      "judge_skipped_refused_n": 2.0,
+      "judge_accuracy": 3.7777777777777777,
+      "judge_accuracy_answered": 4.571428571428571,
+      "judge_completeness": 3.5555555555555554,
+      "judge_completeness_answered": 4.285714285714286,
+      "judge_relevance": 4.111111111111111,
+      "judge_relevance_answered": 5.0,
+      "latency_p50_ms": 1514.0,
+      "latency_p95_ms": 2354.0,
+      "cost_mean_usd": 0.0021785,
+      "cost_total_usd": 0.0196065
+    },
+    "exact_article": {
+      "n": 4.0,
+      "retrieval_n": 4.0,
+      "mrr": 0.625,
+      "recall@1": 0.5,
+      "recall@3": 0.75,
+      "recall@5": 0.75,
+      "recall@8": 0.75,
+      "precision@1": 0.5,
+      "precision@3": 0.25,
+      "precision@5": 0.15000000000000002,
+      "precision@8": 0.09375,
+      "chunk_recall@8": 0.6666666666666666,
+      "oos_refusal_rate": null,
+      "false_refusal_rate": 0.25,
+      "cited_n": 6.0,
+      "invalid_citation_rate": 0.0,
+      "invalid_format_rate": 0.0,
+      "invalid_not_retrieved_rate": 0.0,
+      "answers_with_format_error_n": 0.0,
+      "citation_precision_article": 1.0,
+      "citation_precision_point": 0.6666666666666666,
+      "article_only_citation_share": 0.0,
+      "judge_n": 3.0,
+      "judge_skipped_refused_n": 1.0,
+      "judge_accuracy": 3.5,
+      "judge_accuracy_answered": 4.333333333333333,
+      "judge_completeness": 3.25,
+      "judge_completeness_answered": 4.0,
+      "judge_relevance": 4.0,
+      "judge_relevance_answered": 5.0,
+      "latency_p50_ms": 1734.0,
+      "latency_p95_ms": 2995.0,
+      "cost_mean_usd": 0.0025979099999999997,
+      "cost_total_usd": 0.010391639999999999
+    },
+    "colloquial": {
+      "n": 7.0,
+      "retrieval_n": 7.0,
+      "mrr": 0.2857142857142857,
+      "recall@1": 0.14285714285714285,
+      "recall@3": 0.42857142857142855,
+      "recall@5": 0.42857142857142855,
+      "recall@8": 0.42857142857142855,
+      "precision@1": 0.14285714285714285,
+      "precision@3": 0.14285714285714285,
+      "precision@5": 0.08571428571428573,
+      "precision@8": 0.05357142857142857,
+      "chunk_recall@8": 0.42857142857142855,
+      "oos_refusal_rate": null,
+      "false_refusal_rate": 0.42857142857142855,
+      "cited_n": 4.0,
+      "invalid_citation_rate": 0.5,
+      "invalid_format_rate": 0.5,
+      "invalid_not_retrieved_rate": 0.0,
+      "answers_with_format_error_n": 2.0,
+      "citation_precision_article": 0.25,
+      "citation_precision_point": 0.25,
+      "article_only_citation_share": 0.0,
+      "judge_n": 4.0,
+      "judge_skipped_refused_n": 3.0,
+      "judge_accuracy": 3.142857142857143,
+      "judge_accuracy_answered": 4.75,
+      "judge_completeness": 3.142857142857143,
+      "judge_completeness_answered": 4.75,
+      "judge_relevance": 3.2857142857142856,
+      "judge_relevance_answered": 5.0,
+      "latency_p50_ms": 1684.0,
+      "latency_p95_ms": 2276.0,
+      "cost_mean_usd": 0.0019957514285714284,
+      "cost_total_usd": 0.01397026
+    },
+    "multi_article": {
+      "n": 5.0,
+      "retrieval_n": 5.0,
+      "mrr": 0.325,
+      "recall@1": 0.1,
+      "recall@3": 0.2,
+      "recall@5": 0.2,
+      "recall@8": 0.3,
+      "precision@1": 0.2,
+      "precision@3": 0.13333333333333333,
+      "precision@5": 0.08,
+      "precision@8": 0.075,
+      "chunk_recall@8": 0.26666666666666666,
+      "oos_refusal_rate": null,
+      "false_refusal_rate": 0.2,
+      "cited_n": 9.0,
+      "invalid_citation_rate": 0.0,
+      "invalid_format_rate": 0.0,
+      "invalid_not_retrieved_rate": 0.0,
+      "answers_with_format_error_n": 0.0,
+      "citation_precision_article": 0.3333333333333333,
+      "citation_precision_point": 0.3333333333333333,
+      "article_only_citation_share": 0.1111111111111111,
+      "judge_n": 4.0,
+      "judge_skipped_refused_n": 1.0,
+      "judge_accuracy": 2.8,
+      "judge_accuracy_answered": 3.25,
+      "judge_completeness": 2.8,
+      "judge_completeness_answered": 3.25,
+      "judge_relevance": 4.0,
+      "judge_relevance_answered": 4.75,
+      "latency_p50_ms": 2327.0,
+      "latency_p95_ms": 2796.0,
+      "cost_mean_usd": 0.003033096,
+      "cost_total_usd": 0.01516548
+    },
+    "out_of_scope": {
+      "n": 4.0,
+      "retrieval_n": 0.0,
+      "mrr": null,
+      "recall@1": null,
+      "recall@3": null,
+      "recall@5": null,
+      "recall@8": null,
+      "precision@1": null,
+      "precision@3": null,
+      "precision@5": null,
+      "precision@8": null,
+      "chunk_recall@8": null,
+      "oos_refusal_rate": 1.0,
+      "false_refusal_rate": null,
+      "cited_n": 0.0,
+      "invalid_citation_rate": null,
+      "invalid_format_rate": null,
+      "invalid_not_retrieved_rate": null,
+      "answers_with_format_error_n": 0.0,
+      "citation_precision_article": null,
+      "citation_precision_point": null,
+      "article_only_citation_share": null,
+      "judge_n": 0.0,
+      "judge_skipped_refused_n": 0.0,
+      "judge_accuracy": null,
+      "judge_accuracy_answered": null,
+      "judge_completeness": null,
+      "judge_completeness_answered": null,
+      "judge_relevance": null,
+      "judge_relevance_answered": null,
+      "latency_p50_ms": 1392.0,
+      "latency_p95_ms": 1945.0,
+      "cost_mean_usd": 0.000881015,
+      "cost_total_usd": 0.00352406
+    }
+  },
+  "items": [
+    {
+      "id": "fact-01",
+      "category": "factual",
+      "question": "Sınaq müddəti ən çoxu nə qədər ola bilər?",
+      "relevant_chunks": [
+        "51.1"
+      ],
+      "request_id": "e831cec88300",
+      "retrieved_chunk_ids": [
+        "52",
+        "51.3",
+        "51.1",
+        "53.2",
+        "53.1",
+        "51.2",
+        "53.4",
+        "270.9"
+      ],
+      "retrieved_article_nos": [
+        "52",
+        "51",
+        "53",
+        "270"
+      ],
+      "answer": "Sınaq müddəti altı ay müddətinədək bağlanılmış əmək müqaviləsində ən çoxu iki həftə, digər əmək müqavilələrində isə ən çoxu üç ay müəyyən edilə bilər.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "51.1",
+          "point": "1"
+        }
+      ],
+      "invalid_citations": [
+        {
+          "article": "51.1",
+          "point": "1"
+        }
+      ],
+      "judge": {
+        "accuracy": 5,
+        "completeness": 5,
+        "relevance": 5,
+        "rationale": "The answer accurately and completely restates the key points from the reference: the maximum trial period is two weeks for contracts up to six months, and three months for other contracts. It directly addresses the question with no extraneous information."
+      },
+      "judge_skipped": null,
+      "latency_ms": 2321,
+      "cost_usd": 0.00234052
+    },
+    {
+      "id": "fact-03",
+      "category": "factual",
+      "question": "İşçi öz təşəbbüsü ilə işdən çıxmaq istəyirsə, işəgötürəni nə qədər əvvəl xəbərdar etməlidir?",
+      "relevant_chunks": [
+        "69.1"
+      ],
+      "request_id": "db21076157c3",
+      "retrieved_chunk_ids": [
+        "60",
+        "57.1",
+        "69.7",
+        "57.4",
+        "62.5",
+        "78.1",
+        "196.4",
+        "224.3"
+      ],
+      "retrieved_article_nos": [
+        "60",
+        "57",
+        "69",
+        "62",
+        "78",
+        "196",
+        "224"
+      ],
+      "answer": "Təqdim olunan Əmək Məcəlləsi maddələrində bu suala cavab tapılmadı, ona görə cavab verə bilmirəm.",
+      "refused": true,
+      "cited": [],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 1,
+        "completeness": 1,
+        "relevance": 1,
+        "rationale": "Refused an in-scope question: scored 1 without a judge call."
+      },
+      "judge_skipped": "refused",
+      "latency_ms": 1418,
+      "cost_usd": 0.00078324
+    },
+    {
+      "id": "fact-04",
+      "category": "factual",
+      "question": "Gündəlik və həftəlik normal iş vaxtının müddəti ən çoxu nə qədərdir?",
+      "relevant_chunks": [
+        "89.2",
+        "89.3"
+      ],
+      "request_id": "ca6205cb70b5",
+      "retrieved_chunk_ids": [
+        "89.3",
+        "90.3",
+        "90.1",
+        "89.2",
+        "150.3",
+        "147.4",
+        "148.4",
+        "153"
+      ],
+      "retrieved_article_nos": [
+        "89",
+        "90",
+        "150",
+        "147",
+        "148",
+        "153"
+      ],
+      "answer": "Gündəlik normal iş vaxtının müddəti səkkiz saatdan artıq ola bilməz. Həftəlik normal iş vaxtının müddəti isə 40 saatdan artıq müəyyən edilə bilməz. Altıgünlük iş həftəsində isə gündəlik iş vaxtının müddəti həftəlik norma 40 saat olduqda 7 saatdan, həftəlik norma 36 saat olduqda 6 saatdan, həftəlik norma 24 saat olduqda isə 4 saatdan çox ola bilməz.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "89",
+          "point": "2"
+        },
+        {
+          "article": "89",
+          "point": "3"
+        },
+        {
+          "article": "90",
+          "point": "3"
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 4,
+        "completeness": 4,
+        "relevance": 5,
+        "rationale": "The answer correctly states the maximum daily (8 hours) and weekly (40 hours) normal working hours, matching the reference. However, it adds extra details about six-day work weeks and specific daily limits for different weekly norms, which are not present in the reference. This is a minor imprecision and a minor addition, so accuracy and completeness are rated 4. The answer is fully relevant to the question."
+      },
+      "judge_skipped": null,
+      "latency_ms": 2115,
+      "cost_usd": 0.00286592
+    },
+    {
+      "id": "fact-05",
+      "category": "factual",
+      "question": "Əmək Məcəlləsinə görə gecə vaxtı hansı saatlar hesab olunur?",
+      "relevant_chunks": [
+        "97.1"
+      ],
+      "request_id": "0af9f0de162c",
+      "retrieved_chunk_ids": [
+        "8.1",
+        "8.2",
+        "8.4",
+        "8.3",
+        "73.1",
+        "317.2",
+        "172.5",
+        "48.6"
+      ],
+      "retrieved_article_nos": [
+        "8",
+        "73",
+        "317",
+        "172",
+        "48"
+      ],
+      "answer": "Təqdim olunan Əmək Məcəlləsi maddələrində bu suala cavab tapılmadı, ona görə cavab verə bilmirəm.",
+      "refused": true,
+      "cited": [],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 1,
+        "completeness": 1,
+        "relevance": 1,
+        "rationale": "Refused an in-scope question: scored 1 without a judge call."
+      },
+      "judge_skipped": "refused",
+      "latency_ms": 1514,
+      "cost_usd": 0.0006862400000000001
+    },
+    {
+      "id": "fact-06",
+      "category": "factual",
+      "question": "İki iş günü arasında gündəlik istirahət vaxtı ən azı neçə saat olmalıdır?",
+      "relevant_chunks": [
+        "103.4"
+      ],
+      "request_id": "e55a86b01969",
+      "retrieved_chunk_ids": [
+        "103.4",
+        "108.2",
+        "90.1",
+        "164.2",
+        "104.2",
+        "164.1",
+        "108.1",
+        "104.1"
+      ],
+      "retrieved_article_nos": [
+        "103",
+        "108",
+        "90",
+        "164",
+        "104"
+      ],
+      "answer": "İki iş günü arasında gündəlik istirahət vaxtı azı 12 saat olmalıdır.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "103.4",
+          "point": null
+        }
+      ],
+      "invalid_citations": [
+        {
+          "article": "103.4",
+          "point": null
+        }
+      ],
+      "judge": {
+        "accuracy": 5,
+        "completeness": 5,
+        "relevance": 5,
+        "rationale": "The answer exactly matches the reference, stating that the daily rest period between two working days must be at least 12 hours. All key points are covered, and the response is directly relevant to the question."
+      },
+      "judge_skipped": null,
+      "latency_ms": 1357,
+      "cost_usd": 0.00232432
+    },
+    {
+      "id": "fact-13",
+      "category": "factual",
+      "question": "İntizam tənbehi verildikdən sonra nə qədər müddət qüvvədə qalır?",
+      "relevant_chunks": [
+        "190.1"
+      ],
+      "request_id": "ce6fd7e86f9a",
+      "retrieved_chunk_ids": [
+        "190.1",
+        "187.3",
+        "190.4",
+        "189.4",
+        "189.3",
+        "187.2",
+        "188.2",
+        "189.1"
+      ],
+      "retrieved_article_nos": [
+        "190",
+        "187",
+        "189",
+        "188"
+      ],
+      "answer": "İntizam tənbehi verilən gündən altı ay müddətində qüvvədə olur.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "190",
+          "point": "1"
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 4,
+        "completeness": 4,
+        "relevance": 5,
+        "rationale": "The answer correctly states that the disciplinary sanction remains in force for six months from the date it is given, which matches the core of the reference. However, it omits the exception mentioned in the reference (186-cı maddənin 2-ci hissəsinin \"ç\" bəndi istisna olmaqla), which is a minor but relevant detail. The answer is fully relevant to the question."
+      },
+      "judge_skipped": null,
+      "latency_ms": 1320,
+      "cost_usd": 0.00265314
+    },
+    {
+      "id": "fact-16",
+      "category": "factual",
+      "question": "Dövlət büdcəsindən maliyyələşən müəssisələrdə çalışmanın yaş həddi neçədir?",
+      "relevant_chunks": [
+        "10-1.1"
+      ],
+      "request_id": "abd1aed2cdeb",
+      "retrieved_chunk_ids": [
+        "10-1.1",
+        "10-1.6",
+        "10-1.2",
+        "10-1.5",
+        "10-1.7",
+        "4.3",
+        "10-1.4",
+        "220.1"
+      ],
+      "retrieved_article_nos": [
+        "10-1",
+        "4",
+        "220"
+      ],
+      "answer": "Dövlət büdcəsindən maliyyələşən müəssisələrdə çalışmanın yaş həddi 65-dir.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "10-1.1",
+          "point": null
+        }
+      ],
+      "invalid_citations": [
+        {
+          "article": "10-1.1",
+          "point": null
+        }
+      ],
+      "judge": {
+        "accuracy": 5,
+        "completeness": 3,
+        "relevance": 5,
+        "rationale": "The answer correctly states that the age limit is 65, which matches the core of the reference. However, it omits the additional key point that the employment period can be extended each time for up to 1 year, but not exceeding a total of 5 years. Thus, completeness is scored 3."
+      },
+      "judge_skipped": null,
+      "latency_ms": 1424,
+      "cost_usd": 0.0024948600000000002
+    },
+    {
+      "id": "fact-20",
+      "category": "factual",
+      "question": "İş vaxtından artıq işin hər saatı üçün əmək haqqı necə ödənilir?",
+      "relevant_chunks": [
+        "165.1"
+      ],
+      "request_id": "6fdd2bbe08f4",
+      "retrieved_chunk_ids": [
+        "165.1",
+        "165.3",
+        "99.4",
+        "99.1",
+        "100.1",
+        "165.2",
+        "99.5",
+        "102.1"
+      ],
+      "retrieved_article_nos": [
+        "165",
+        "99",
+        "100",
+        "102"
+      ],
+      "answer": "İş vaxtından artıq vaxt ərzində görülən işin hər saatı üçün əmək haqqı aşağıdakı kimi ödənilir: əmək vaxtamuzd ödənilmə sistemində saatlıq tarif (vəzifə) maaşının ikiqat məbləğindən aşağı olmamaqla; əmək işəmuzd ödənilmə sistemində işəmuzd əmək haqqı tam ödənilməklə müvafiq dərəcəli (ixtisaslı) vaxtamuzd işçinin saatlıq tarif (vəzifə) maaşından aşağı olmamaqla əlavə haqq məbləğində.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "165",
+          "point": "1"
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 5,
+        "completeness": 5,
+        "relevance": 5,
+        "rationale": "The answer accurately reflects the reference by stating that for the time-based wage system, overtime is paid at no less than double the hourly rate, and for the piecework system, the full piecework wage is paid plus an additional amount not less than the hourly rate of a corresponding time-based worker. All key points are covered, and the answer is directly relevant to the question."
+      },
+      "judge_skipped": null,
+      "latency_ms": 2354,
+      "cost_usd": 0.0029094999999999998
+    },
+    {
+      "id": "fact-21",
+      "category": "factual",
+      "question": "Kollektiv müqavilə hansı müddətə bağlanır və müddəti bitdikdən sonra nə olur?",
+      "relevant_chunks": [
+        "32.1",
+        "32.3"
+      ],
+      "request_id": "49da79acbf4b",
+      "retrieved_chunk_ids": [
+        "32.3",
+        "32.6",
+        "33",
+        "32.5",
+        "34.2",
+        "30.6",
+        "30.7",
+        "30.4"
+      ],
+      "retrieved_article_nos": [
+        "32",
+        "33",
+        "34",
+        "30"
+      ],
+      "answer": "Kollektiv müqavilə müəyyən olunmuş müddətə bağlanır. Müəyyən olunmuş müddət qurtardıqdan sonra kollektiv müqavilə, yenisi bağlananadək, lakin ən çoxu üç il müddətədək qüvvədə olur.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "32",
+          "point": "3"
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 4,
+        "completeness": 4,
+        "relevance": 5,
+        "rationale": "The answer correctly states that the collective agreement is concluded for a specified period and remains in force for up to three years after expiry until a new one is signed. However, it omits the specific range of one to three years for the initial term, which is a minor but relevant detail from the reference."
+      },
+      "judge_skipped": null,
+      "latency_ms": 2024,
+      "cost_usd": 0.00254876
+    },
+    {
+      "id": "coll-01",
+      "category": "colloquial",
+      "question": "Məni ixtisar adı ilə işdən qovdular, 3 il işləmişəm. Mənə nə qədər pul verməlidirlər?",
+      "relevant_chunks": [
+        "77.3"
+      ],
+      "request_id": "8e0ab206737b",
+      "retrieved_chunk_ids": [
+        "3.8",
+        "3.9",
+        "3.9-2",
+        "113.3",
+        "196.5",
+        "137.3",
+        "283",
+        "3.3"
+      ],
+      "retrieved_article_nos": [
+        "3",
+        "113",
+        "196",
+        "137",
+        "283"
+      ],
+      "answer": "Təqdim olunan Əmək Məcəlləsi maddələrində bu suala cavab tapılmadı, ona görə cavab verə bilmirəm.",
+      "refused": true,
+      "cited": [],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 1,
+        "completeness": 1,
+        "relevance": 1,
+        "rationale": "Refused an in-scope question: scored 1 without a judge call."
+      },
+      "judge_skipped": "refused",
+      "latency_ms": 1416,
+      "cost_usd": 0.0008518
+    },
+    {
+      "id": "coll-03",
+      "category": "colloquial",
+      "question": "Dekretə çıxıram, neçə gün evdə qala bilərəm, pulu ödənilir?",
+      "relevant_chunks": [
+        "125.1"
+      ],
+      "request_id": "c451938ba877",
+      "retrieved_chunk_ids": [
+        "164.1",
+        "171",
+        "174.4",
+        "156.2",
+        "175.3",
+        "169.2",
+        "8.4",
+        "169.1"
+      ],
+      "retrieved_article_nos": [
+        "164",
+        "171",
+        "174",
+        "156",
+        "175",
+        "169",
+        "8"
+      ],
+      "answer": "Təqdim olunan Əmək Məcəlləsi maddələrində bu suala cavab tapılmadı, ona görə cavab verə bilmirəm.",
+      "refused": true,
+      "cited": [],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 1,
+        "completeness": 1,
+        "relevance": 1,
+        "rationale": "Refused an in-scope question: scored 1 without a judge call."
+      },
+      "judge_skipped": "refused",
+      "latency_ms": 1761,
+      "cost_usd": 0.0007454600000000001
+    },
+    {
+      "id": "coll-05",
+      "category": "colloquial",
+      "question": "Bayram günü işə çağırdılar, ikiqat pul verməlidirlər?",
+      "relevant_chunks": [
+        "164.1",
+        "164.2"
+      ],
+      "request_id": "a469d8920b88",
+      "retrieved_chunk_ids": [
+        "105.3",
+        "164.2",
+        "105.6",
+        "164.1",
+        "107",
+        "108.1",
+        "105.5",
+        "108.2"
+      ],
+      "retrieved_article_nos": [
+        "105",
+        "164",
+        "107",
+        "108"
+      ],
+      "answer": "Bayram günü işə çağırılan işçiyə əməkhaqqı aşağıdakı kimi ödənilir: əgər əmək vaxtamuzd ödənilirsə, gündəlik (saatlıq) tarif maaşının iki mislindən az olmamaqla; işəmuzd ödənilirsə, ikiqat işəmuzd qiymətlərindən az olmamaqla; aylıq maaş alan işçilərə isə iş aylıq iş vaxtı norması çərçivəsində görülmüşsə, maaşdan əlavə gündəlik (saatlıq) vəzifə maaşı məbləğindən az olmamaqla, əgər iş aylıq iş vaxtı normasından artıq vaxtda görülmüşsə, maaşdan əlavə gündəlik (saatlıq) vəzifə maaşının ikiqat məbləğindən az olmamaqla ödənilir.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "164",
+          "point": "1"
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 5,
+        "completeness": 5,
+        "relevance": 5,
+        "rationale": "The answer accurately and completely reflects the reference, detailing the payment rules for bayram (holiday) work for all wage systems and mentioning the required minimums. It directly addresses the question without any off-topic information."
+      },
+      "judge_skipped": null,
+      "latency_ms": 2276,
+      "cost_usd": 0.00307408
+    },
+    {
+      "id": "coll-11",
+      "category": "colloquial",
+      "question": "Gecə növbəsində işləyirəm, mənə artıq pul düşür?",
+      "relevant_chunks": [
+        "166.1",
+        "166.2"
+      ],
+      "request_id": "7c624182add3",
+      "retrieved_chunk_ids": [
+        "137.3",
+        "165.3",
+        "196.5",
+        "99.2",
+        "99.3",
+        "99.4",
+        "58.3",
+        "99.1"
+      ],
+      "retrieved_article_nos": [
+        "137",
+        "165",
+        "196",
+        "99",
+        "58"
+      ],
+      "answer": "Təqdim olunan Əmək Məcəlləsi maddələrində bu suala cavab tapılmadı, ona görə cavab verə bilmirəm.",
+      "refused": true,
+      "cited": [],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 1,
+        "completeness": 1,
+        "relevance": 1,
+        "rationale": "Refused an in-scope question: scored 1 without a judge call."
+      },
+      "judge_skipped": "refused",
+      "latency_ms": 1484,
+      "cost_usd": 0.0007478000000000001
+    },
+    {
+      "id": "coll-12",
+      "category": "colloquial",
+      "question": "Hamiləyəm, həkimə müayinəyə getdiyim günlərin pulunu kəsə bilərlər?",
+      "relevant_chunks": [
+        "245.2"
+      ],
+      "request_id": "3f380be98117",
+      "retrieved_chunk_ids": [
+        "245.2",
+        "226.1",
+        "226.1-1",
+        "245.1",
+        "226.2",
+        "236.3",
+        "290.1",
+        "122.2"
+      ],
+      "retrieved_article_nos": [
+        "245",
+        "226",
+        "236",
+        "290",
+        "122"
+      ],
+      "answer": "Hamilə qadınların tibb müəssisələrində dispanser və ambulator müayinələrinin keçirildiyi günlərdə orta əmək haqqı saxlanılır. İşəgötürən hamilə qadınlara belə müayinələrin keçirilməsi üçün zəruri şərait yaratmalıdır, yəni həmin günlərin əmək haqqını kəsmək olmaz.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "245.2",
+          "point": "2"
+        }
+      ],
+      "invalid_citations": [
+        {
+          "article": "245.2",
+          "point": "2"
+        }
+      ],
+      "judge": {
+        "accuracy": 5,
+        "completeness": 5,
+        "relevance": 5,
+        "rationale": "The answer accurately states that pregnant women retain their average salary on days they attend medical examinations, directly matching the reference. It covers all key points and is fully relevant to the question asked."
+      },
+      "judge_skipped": null,
+      "latency_ms": 1878,
+      "cost_usd": 0.00257074
+    },
+    {
+      "id": "coll-14",
+      "category": "colloquial",
+      "question": "Həftədə 6 gün işləyirəm, gündə ən çox neçə saat işlətmək olar?",
+      "relevant_chunks": [
+        "90.3"
+      ],
+      "request_id": "bd3a9104250b",
+      "retrieved_chunk_ids": [
+        "108.2",
+        "90.1",
+        "90.3",
+        "97.1",
+        "103.4",
+        "99.4",
+        "96.1",
+        "89.3"
+      ],
+      "retrieved_article_nos": [
+        "108",
+        "90",
+        "97",
+        "103",
+        "99",
+        "96",
+        "89"
+      ],
+      "answer": "Altıgünlük iş həftəsində gündəlik iş vaxtının müddəti həftəlik norma 40 saat olduqda 7 saatdan, həftəlik norma 36 saat olduqda 6 saatdan və həftəlik norma 24 saat olduqda 4 saatdan çox ola bilməz.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "90.3",
+          "point": "3"
+        }
+      ],
+      "invalid_citations": [
+        {
+          "article": "90.3",
+          "point": "3"
+        }
+      ],
+      "judge": {
+        "accuracy": 5,
+        "completeness": 5,
+        "relevance": 5,
+        "rationale": "The answer accurately restates all the key points from the reference, including the maximum daily working hours for 40, 36, and 24-hour weekly norms. It is complete and directly addresses the question without any irrelevant information."
+      },
+      "judge_skipped": null,
+      "latency_ms": 1585,
+      "cost_usd": 0.00241476
+    },
+    {
+      "id": "coll-15",
+      "category": "colloquial",
+      "question": "Müdir məni zorla \"öz xahişimlə\" ərizə yazmağa məcbur edir. Bu qanunidir?",
+      "relevant_chunks": [
+        "69.7"
+      ],
+      "request_id": "36ff90a77e0e",
+      "retrieved_chunk_ids": [
+        "7.2-3",
+        "75.5",
+        "43.4",
+        "85.1",
+        "71.3",
+        "68.2",
+        "82",
+        "9"
+      ],
+      "retrieved_article_nos": [
+        "7",
+        "75",
+        "43",
+        "85",
+        "71",
+        "68",
+        "82",
+        "9"
+      ],
+      "answer": "Əmək müqaviləsinə xitam verilməsinə dair tərəflər onların şərəf və ləyaqətini alçaldan, hüquqlarını məhdudlaşdırmağa yönəldilən şərtlər müəyyən edə bilməzlər. Buna görə, zorla \"öz xahişimlə\" ərizə yazmağa məcbur etmək qanunidir deyildir.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "75",
+          "point": "5"
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 4,
+        "completeness": 4,
+        "relevance": 5,
+        "rationale": "The answer correctly states that forcing someone to write a resignation letter is not legal and refers to the prohibition of degrading or limiting rights, which is consistent with the reference. However, it does not explicitly mention the prohibition of coercion, threats, or other means as stated in the reference (Maddə 69.7), missing a minor but relevant detail. All key points are mostly covered, but the specific language of 'zor, hədə-qorxu və ya başqa üsulla' is not directly cited."
+      },
+      "judge_skipped": null,
+      "latency_ms": 1684,
+      "cost_usd": 0.00356562
+    },
+    {
+      "id": "exact-01",
+      "category": "exact_article",
+      "question": "Əmək Məcəlləsinin 72-ci maddəsi hansı halları əmək vəzifələrinin kobud pozulması sayır?",
+      "relevant_chunks": [
+        "72"
+      ],
+      "request_id": "4efca076fc01",
+      "retrieved_chunk_ids": [
+        "71.3",
+        "74.1-2",
+        "75.5",
+        "75.4",
+        "83.1",
+        "82",
+        "76.1",
+        "75.1"
+      ],
+      "retrieved_article_nos": [
+        "71",
+        "74",
+        "75",
+        "83",
+        "82",
+        "76"
+      ],
+      "answer": "Təqdim olunan Əmək Məcəlləsi maddələrində bu suala cavab tapılmadı, ona görə cavab verə bilmirəm.",
+      "refused": true,
+      "cited": [],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 1,
+        "completeness": 1,
+        "relevance": 1,
+        "rationale": "Refused an in-scope question: scored 1 without a judge call."
+      },
+      "judge_skipped": "refused",
+      "latency_ms": 1587,
+      "cost_usd": 0.0007129199999999999
+    },
+    {
+      "id": "exact-03",
+      "category": "exact_article",
+      "question": "114-cü maddənin 3-cü hissəsinə görə kimlərə 30 təqvim günü əsas məzuniyyət verilir?",
+      "relevant_chunks": [
+        "114.3"
+      ],
+      "request_id": "96b58bd53392",
+      "retrieved_chunk_ids": [
+        "124.4",
+        "114.3",
+        "124.6",
+        "114.1",
+        "124.7",
+        "114.2",
+        "114.5",
+        "140.2"
+      ],
+      "retrieved_article_nos": [
+        "124",
+        "114",
+        "140"
+      ],
+      "answer": "Maddə 114.3-ə əsasən, 30 təqvim günü əsas məzuniyyət aşağıdakı işçilərə verilir: a) kənd təsərrüfatı məhsullarının istehsalında çalışan işçilər; b) inzibati vəzifələrdə çalışan dövlət qulluqçuları, rəhbər və mütəxəssis kateqoriyasına aid edilən işçilər; c) xüsusi təhsil müəssisələri istisna olmaqla, təhsil müəssisəsində pedaqoji iş aparmayan rəhbər işçilər və inzibati-tədris heyəti işçiləri, məktəbdənkənar uşaq müəssisələrinin rəhbərləri; ç) təhsil müəssisələrinin metodistləri, baş ustaları, istehsalat təlimi ustaları, təlimatçıları, kitabxanaçıları, laborantları, emalatxana rəhbərləri, dayələri, dəyişək xidmətçiləri, bədii rəhbərləri; d) elmi dərəcəsi olmayan elmi işçilər; e) həkimlər, orta tibb işçiləri və əczaçılar.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "114",
+          "point": "3"
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 4,
+        "completeness": 4,
+        "relevance": 5,
+        "rationale": "The answer accurately lists the categories from the reference but adds some extra detail (e.g., 'məktəbdənkənar uşaq müəssisələrinin rəhbərləri', 'baş ustaları', 'istehsalat təlimi ustaları', 'təlimatçıları', 'emalatxana rəhbərləri', 'dayələri', 'dəyişək xidmətçiləri', 'bədii rəhbərləri') that are not mentioned in the reference. This is a minor imprecision and a minor addition, so both accuracy and completeness are rated 4. The answer is fully relevant to the question."
+      },
+      "judge_skipped": null,
+      "latency_ms": 2995,
+      "cost_usd": 0.00393972
+    },
+    {
+      "id": "exact-06",
+      "category": "exact_article",
+      "question": "117-ci maddəyə əsasən uşaqlı qadınlara nə qədər əlavə məzuniyyət verilir?",
+      "relevant_chunks": [
+        "117.1"
+      ],
+      "request_id": "e139b1255bf9",
+      "retrieved_chunk_ids": [
+        "117.1",
+        "117.2",
+        "117.3",
+        "117.4",
+        "142.2",
+        "127.1",
+        "126.2",
+        "71.3"
+      ],
+      "retrieved_article_nos": [
+        "117",
+        "142",
+        "127",
+        "126",
+        "71"
+      ],
+      "answer": "14 yaşınadək iki uşağı olan qadınlara 2 təqvim günü, üç və daha çox uşağı olan və ya əlilliyi olan uşağı olan qadınlara isə 5 təqvim günü əlavə məzuniyyət verilir.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "117",
+          "point": "1"
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 5,
+        "completeness": 4,
+        "relevance": 5,
+        "rationale": "The answer accurately states the additional leave days for women with two, three or more, or disabled children, matching the reference. However, it omits the minor point that fathers raising children alone and adoptive parents are also entitled to this leave, which affects completeness."
+      },
+      "judge_skipped": null,
+      "latency_ms": 1734,
+      "cost_usd": 0.0024941
+    },
+    {
+      "id": "exact-08",
+      "category": "exact_article",
+      "question": "48-ci maddəyə görə əmək müqaviləsi bağlanarkən işçi hansı sənədləri təqdim edir?",
+      "relevant_chunks": [
+        "48.1",
+        "48.4",
+        "48.5"
+      ],
+      "request_id": "e901f7fa12ce",
+      "retrieved_chunk_ids": [
+        "48.6",
+        "48.5-1",
+        "48.2",
+        "48.5-3",
+        "48.4",
+        "48.1",
+        "48.3",
+        "79.1"
+      ],
+      "retrieved_article_nos": [
+        "48",
+        "79"
+      ],
+      "answer": "Əmək müqaviləsi bağlanılarkən işçi şəxsiyyətini təsdiq edən sənədi və müəyyən hallarda əmək kitabçasını təqdim edir. Peşə hazırlığı və təhsilin olması zəruri hallarda müvafiq sənəd təqdim edilir. Əlavə sənədlər yalnız işin xüsusiyyətlərinə uyğun olduqda tələb oluna bilər. İşçinin əmək və sosial hüquqları ilə bağlı təminatların sənədləri isə könüllü təqdim olunur.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "48",
+          "point": "1"
+        },
+        {
+          "article": "48",
+          "point": "4"
+        },
+        {
+          "article": "48",
+          "point": "6"
+        },
+        {
+          "article": "48",
+          "point": "5-1"
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 4,
+        "completeness": 4,
+        "relevance": 5,
+        "rationale": "The answer correctly mentions the requirement for an identity document, labor book in certain cases, and documents on professional training or education if necessary, which matches the reference. However, it omits the specific requirement for a medical certificate for certain jobs (heavy, harmful, food, catering, health, trade sectors), which is a key detail in the reference. The statement about voluntary submission of documents related to labor and social rights is not in the reference but does not detract from relevance."
+      },
+      "judge_skipped": null,
+      "latency_ms": 2214,
+      "cost_usd": 0.0032448999999999998
+    },
+    {
+      "id": "multi-01",
+      "category": "multi_article",
+      "question": "Hamilə işçini ixtisara görə işdən çıxarmaq olarmı? Müəssisə ləğv olunarsa necə?",
+      "relevant_chunks": [
+        "79.1",
+        "79.2",
+        "70"
+      ],
+      "request_id": "e5e6b47bf996",
+      "retrieved_chunk_ids": [
+        "69.6",
+        "69.4",
+        "160.2",
+        "60",
+        "69.7",
+        "160.1",
+        "69.5",
+        "77.9"
+      ],
+      "retrieved_article_nos": [
+        "69",
+        "160",
+        "60",
+        "77"
+      ],
+      "answer": "Təqdim olunan Əmək Məcəlləsi maddələrində bu suala cavab tapılmadı, ona görə cavab verə bilmirəm.",
+      "refused": true,
+      "cited": [],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 1,
+        "completeness": 1,
+        "relevance": 1,
+        "rationale": "Refused an in-scope question: scored 1 without a judge call."
+      },
+      "judge_skipped": "refused",
+      "latency_ms": 2327,
+      "cost_usd": 0.0009508200000000001
+    },
+    {
+      "id": "multi-02",
+      "category": "multi_article",
+      "question": "Hamilə qadını iş vaxtından artıq işə cəlb etmək olarmı və onun iş həftəsi neçə saatdan çox olmamalıdır?",
+      "relevant_chunks": [
+        "242.1",
+        "91.2"
+      ],
+      "request_id": "dffc06cec299",
+      "retrieved_chunk_ids": [
+        "242.1",
+        "165.3",
+        "101.1",
+        "165.1",
+        "99.2",
+        "99.4",
+        "166.1",
+        "254.1"
+      ],
+      "retrieved_article_nos": [
+        "242",
+        "165",
+        "101",
+        "99",
+        "166",
+        "254"
+      ],
+      "answer": "Hamilə qadınların iş vaxtından artıq işlərə cəlb olunmasına yalnız onların yazılı razılığı ilə və uşağın həyat və sağlamlığına təhlükə yaranmaması barədə həkim rəyi olduqda yol verilir. İş həftəsinin neçə saatdan çox olmaması barədə məlumat təqdim olunan maddələrdə yoxdur.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "242",
+          "point": "1"
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 3,
+        "completeness": 3,
+        "relevance": 5,
+        "rationale": "The answer correctly states the conditions under which a pregnant woman can be required to work overtime, matching the reference. However, it incorrectly claims that there is no information about the maximum weekly working hours, whereas the reference clearly states it should not exceed 36 hours. This is a material omission, affecting both accuracy and completeness."
+      },
+      "judge_skipped": null,
+      "latency_ms": 2258,
+      "cost_usd": 0.00286942
+    },
+    {
+      "id": "multi-05",
+      "category": "multi_article",
+      "question": "Uşağını təkbaşına böyüdən ata hansı əlavə məzuniyyət və işdən çıxarılmaya qarşı təminatlardan istifadə edə bilər?",
+      "relevant_chunks": [
+        "117.1",
+        "117.2",
+        "79.1"
+      ],
+      "request_id": "efb987e4da20",
+      "retrieved_chunk_ids": [
+        "244.3",
+        "117.2",
+        "246",
+        "244.2",
+        "244.1",
+        "17-1",
+        "126.2",
+        "10"
+      ],
+      "retrieved_article_nos": [
+        "244",
+        "117",
+        "246",
+        "17-1",
+        "126",
+        "10"
+      ],
+      "answer": "Uşağını təkbaşına böyüdən atalar uşaqlı qadınların əlavə məzuniyyət hüququndan istifadə edə bilərlər. Bundan əlavə, uşaqlarını anasız təkbaşına böyüyən atalar üçün qadınlara müəyyən edilmiş hüquqlar üzrə bütün təminatlar şamil edilir.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "117",
+          "point": "2"
+        },
+        {
+          "article": "246",
+          "point": null
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 3,
+        "completeness": 3,
+        "relevance": 4,
+        "rationale": "The answer correctly states that single fathers can benefit from additional leave and protections similar to those given to women, which aligns with the reference's core idea. However, it lacks specific details: it does not mention the exact number of additional leave days (2 or 5 depending on the situation) or the specific protection against dismissal for fathers of children under three. The answer is also somewhat vague and does not specify the age or number of children, missing key points from the reference."
+      },
+      "judge_skipped": null,
+      "latency_ms": 2047,
+      "cost_usd": 0.00307964
+    },
+    {
+      "id": "multi-07",
+      "category": "multi_article",
+      "question": "İşdən çıxarkən istifadə etmədiyim məzuniyyət necə olur və son haqq-hesab nə vaxt verilməlidir?",
+      "relevant_chunks": [
+        "143.1",
+        "143.2",
+        "172.4"
+      ],
+      "request_id": "92cbb066f16b",
+      "retrieved_chunk_ids": [
+        "113.2",
+        "69.6",
+        "142.1",
+        "113.3",
+        "135.2",
+        "113.1",
+        "137.3",
+        "131.4"
+      ],
+      "retrieved_article_nos": [
+        "113",
+        "69",
+        "142",
+        "135",
+        "137",
+        "131"
+      ],
+      "answer": "İşçi müvafiq iş ilində əmək məzuniyyətindən istifadə etmədikdə ona həmin iş ili üçün istifadə edilməmiş əmək məzuniyyətinə görə müəyyən olunmuş qaydada və məbləğdə kompensasiya ödənilir. Məzuniyyət vaxtının əmək haqqı əməyin ödənilməsi üçün nəzərdə tutulan vəsait hesabına ödənilir. İşçi məzuniyyət müddətinin qurtardığı gündən əmək müqaviləsinə xitam verilməsi xahişi ilə işəgötürənə ərizə verə bilər və məzuniyyət müddəti bitənədək bu ərizəni geri götürə və ya etibarsız hesab etmək barədə müraciət edə bilər. Bu halda işçinin xahişi təmin edilməlidir.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "135",
+          "point": "2"
+        },
+        {
+          "article": "142",
+          "point": "1"
+        },
+        {
+          "article": "69",
+          "point": "6"
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 3,
+        "completeness": 3,
+        "relevance": 5,
+        "rationale": "The answer correctly states that unused vacation is compensated if not used, which matches the reference. However, it omits the key point that the unused vacation can be granted as leave at the employee's request and that the termination date is considered the last day of vacation (except for certain cases). It also does not mention that all payments must be made on the day of dismissal. Thus, it is partly correct but misses important details."
+      },
+      "judge_skipped": null,
+      "latency_ms": 2796,
+      "cost_usd": 0.00347502
+    },
+    {
+      "id": "multi-08",
+      "category": "multi_article",
+      "question": "Qanunsuz işdən çıxarıldığımı düşünürəm. Məhkəməyə nə müddətdə müraciət etməliyəm və məhkəmə nə qərar verə bilər?",
+      "relevant_chunks": [
+        "296.2",
+        "300.1"
+      ],
+      "request_id": "aefebbe2dd6b",
+      "retrieved_chunk_ids": [
+        "74.2",
+        "294.4",
+        "9",
+        "7.2-3",
+        "69.4",
+        "12.1",
+        "62.1",
+        "300.1"
+      ],
+      "retrieved_article_nos": [
+        "74",
+        "294",
+        "9",
+        "7",
+        "69",
+        "12",
+        "62",
+        "300"
+      ],
+      "answer": "Məhkəməyə müraciət etmək üçün müəyyən edilmiş iddia müddəti məhkəməyə qədər əmək mübahisələrinə baxan orqanın müvafiq qərar qəbul etdiyi gündən başlanır. Əgər məhkəmə işçinin qanunsuz işdən çıxarılması barədə iddiasını təmin edərsə, işçi işinə bərpa olunur və işəgötürən məhkəmənin qanuni qüvvəyə minmiş qətnaməsini dərhal icra etməlidir. İşə bərpa edilən işçinin yerinə götürülmüş işçi ilə bağlanmış əmək müqaviləsinə isə müəyyən hallarda xitam verilə bilər. Əgər işəgötürən əmək müqaviləsinə xitam verilməsi qaydalarına əməl etməyibsə, məhkəmə işçinin vəzifəsinə bərpa edilməsi barədə qətnamə çıxara və işçiyə dəymiş zərərin məbləğinin ödənilməsini tələb edə bilər.",
+      "refused": false,
+      "cited": [
+        {
+          "article": "294",
+          "point": "4"
+        },
+        {
+          "article": "74",
+          "point": "2"
+        },
+        {
+          "article": "300",
+          "point": "1"
+        }
+      ],
+      "invalid_citations": [],
+      "judge": {
+        "accuracy": 4,
+        "completeness": 4,
+        "relevance": 5,
+        "rationale": "The answer correctly states that the court can reinstate the employee and order compensation for damages if the dismissal was unlawful, matching the reference. However, it does not specify the exact 1-month period from the date the violation is discovered, instead mentioning a more general process about the start of the limitation period. It also adds some extra details about the employment contract of a replacement worker, which is not in the reference, but this does not detract from relevance."
+      },
+      "judge_skipped": null,
+      "latency_ms": 2694,
+      "cost_usd": 0.004790580000000001
+    },
+    {
+      "id": "oos-03",
+      "category": "out_of_scope",
+      "question": "Yaşa görə əmək pensiyasının məbləği necə hesablanır?",
+      "relevant_chunks": [],
+      "request_id": "942b5cd0e374",
+      "retrieved_chunk_ids": [
+        "175.3",
+        "173.2",
+        "69.3",
+        "253.2",
+        "178.3",
+        "224.1",
+        "202.2",
+        "140.3"
+      ],
+      "retrieved_article_nos": [
+        "175",
+        "173",
+        "69",
+        "253",
+        "178",
+        "224",
+        "202",
+        "140"
+      ],
+      "answer": "Təqdim olunan Əmək Məcəlləsi maddələrində bu suala cavab tapılmadı, ona görə cavab verə bilmirəm.",
+      "refused": true,
+      "cited": [],
+      "invalid_citations": [],
+      "judge": null,
+      "judge_skipped": "out_of_scope",
+      "latency_ms": 1374,
+      "cost_usd": 0.00081252
+    },
+    {
+      "id": "oos-06",
+      "category": "out_of_scope",
+      "question": "Məhdud məsuliyyətli cəmiyyəti necə qeydiyyatdan keçirmək olar?",
+      "relevant_chunks": [],
+      "request_id": "ea378ceeb79c",
+      "retrieved_chunk_ids": [
+        "75.5",
+        "223.4",
+        "10",
+        "82",
+        "317.2",
+        "7.2-3",
+        "83.1",
+        "81.2"
+      ],
+      "retrieved_article_nos": [
+        "75",
+        "223",
+        "10",
+        "82",
+        "317",
+        "7",
+        "83",
+        "81"
+      ],
+      "answer": "Təqdim olunan Əmək Məcəlləsi maddələrində bu suala cavab tapılmadı, ona görə cavab verə bilmirəm.",
+      "refused": true,
+      "cited": [],
+      "invalid_citations": [],
+      "judge": null,
+      "judge_skipped": "out_of_scope",
+      "latency_ms": 1671,
+      "cost_usd": 0.0009554800000000001
+    },
+    {
+      "id": "oos-09",
+      "category": "out_of_scope",
+      "question": "Sabah Bakıda hava necə olacaq?",
+      "relevant_chunks": [],
+      "request_id": "016ffff69eb3",
+      "retrieved_chunk_ids": [
+        "233.2",
+        "233.3",
+        "89.2",
+        "233.1",
+        "103.1",
+        "103.4",
+        "99.4",
+        "105.3"
+      ],
+      "retrieved_article_nos": [
+        "233",
+        "89",
+        "103",
+        "99",
+        "105"
+      ],
+      "answer": "Təqdim olunan Əmək Məcəlləsi maddələrində bu suala cavab tapılmadı, ona görə cavab verə bilmirəm.",
+      "refused": true,
+      "cited": [],
+      "invalid_citations": [],
+      "judge": null,
+      "judge_skipped": "out_of_scope",
+      "latency_ms": 1945,
+      "cost_usd": 0.00059986
+    },
+    {
+      "id": "oos-10",
+      "category": "out_of_scope",
+      "question": "Plov necə bişirilir?",
+      "relevant_chunks": [],
+      "request_id": "6cb7bb315b0b",
+      "retrieved_chunk_ids": [
+        "288",
+        "292.3",
+        "292.2",
+        "174.4",
+        "233.4",
+        "275.3",
+        "12.1",
+        "161.2"
+      ],
+      "retrieved_article_nos": [
+        "288",
+        "292",
+        "174",
+        "233",
+        "275",
+        "12",
+        "161"
+      ],
+      "answer": "Təqdim olunan Əmək Məcəlləsi maddələrində bu suala cavab tapılmadı, ona görə cavab verə bilmirəm.",
+      "refused": true,
+      "cited": [],
+      "invalid_citations": [],
+      "judge": null,
+      "judge_skipped": "out_of_scope",
+      "latency_ms": 1392,
+      "cost_usd": 0.0011562
+    }
+  ],
+  "total_cost_usd": 0.06265794,
+  "wall_time_s": 81.88,
+  "budget_exceeded": false,
+  "stopped_reason": null
+}

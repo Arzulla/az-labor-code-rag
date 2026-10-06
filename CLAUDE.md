@@ -162,4 +162,8 @@ and report the results.
 
 - `make setup` · `make data` · `make ingest` · `make index` · `make app` · `make test` · `make lint`
 - `make smoke` (Phase 2 smoke run, real API) · `uv run pytest -m integration`
-- `make eval LABEL=<name> SPLIT=dev`
+- `make eval LABEL=<name> SPLIT=dev` (answers + judge) · `make eval-retrieval LABEL=<name>`
+  (retrieval metrics only, no answer/judge calls)
+- `make compare A=<result.json> B=<result.json>` (B - A metric deltas)
+- `make baseline` (dev ×2 + test ×1, then README table + `eval/calibration.jsonl`)
+- `make calibrate` (judge vs. human accuracy: agreement, Spearman; "pending" until filled)
