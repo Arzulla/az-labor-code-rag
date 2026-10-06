@@ -14,7 +14,28 @@ data:
   processed_dir: data/processed  # chunks.jsonl (make ingest)
   download_timeout_s: 60
 
-# Later phases (not typed yet):
-# llm:        pinned model names, timeout_s, max_attempts, judge model (fixed)
-# embedding:  model name (collection name includes it)
-# retrieval:  k, rrf constant, rerank top-n
+llm:
+  # OpenAI-compatible endpoint; a local provider only needs a different base_url (Phase 4).
+  base_url: https://api.openai.com/v1
+  # Pinned (ADR-004). Changing the embedding model needs `make index` (new collection).
+  embedding_model: text-embedding-3-small
+  answer_model: gpt-4.1-mini-2025-04-14
+  judge_model: gpt-4.1-2025-04-14  # FIXED: never change silently (Phase 3 judge)
+  timeout_s: 30
+  max_attempts: 4                  # 1 call + up to 3 retries on transient errors
+  embed_batch_size: 128
+  # USD per 1M tokens (openai.com/api/pricing, checked 2026-10-06). Used for cost_usd.
+  prices_usd_per_1m:
+    text-embedding-3-small: {input: 0.02}
+    gpt-4.1-mini-2025-04-14: {input: 0.40, output: 1.60}
+    gpt-4.1-2025-04-14: {input: 2.00, output: 8.00}
+
+index:
+  chroma_dir: data/chroma
+  cache_path: data/cache/embeddings.sqlite  # key: (embedding_model, sha256(chunk text))
+  collection_prefix: labor_code             # collection: labor_code__<embedding_model>
+
+retrieval:
+  k: 8
+
+# Later phases (not typed yet): retrieval.rrf_k, rerank top-n
