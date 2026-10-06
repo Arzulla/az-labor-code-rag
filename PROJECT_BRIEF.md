@@ -91,7 +91,7 @@ hər konfiqurasiya ən az 2 dəfə; golden set nəticəni yaxşılaşdırmaq ü�
 ## Mərhələlər
 
 - [x] **0. Scaffolding:** struktur, config, logging, lint, test
-- [ ] **1. Data:** mənbə və istifadə şərtləri, parse, maddə chunking, testlər (~5 saat)
+- [x] **1. Data:** mənbə və istifadə şərtləri, parse, maddə chunking, testlər (~5 saat)
 - [ ] **2. Baseline:** yalnız vector search (1 encoder) + cavab + istinad + sadə UI (~4 saat)
 - [ ] **3. Golden set + eval:** 60-80 sual, baseline nəticəsi (~6 saat)
 - [ ] **4. Eksperimentlər:** encoder müqayisəsi → hybrid → rerank → rewriting, hər biri ayrıca (~7 saat)
@@ -125,3 +125,38 @@ Format: **Qərar → Alternativlər → Niyə → Ölçülən nəticə.**
   sualına cavab isə Phase 5-də refusal kimi yoxlanıla bilər.
 - Nəticə: qanun body-sində 140 `<s>` tag; 329 əvəzinə 327 maddə (1-317 + 12 tireli,
   241 və 298 çıxmaqla); "ləğv edilmişdir" bəndləri (5 ədəd) ayrıca `repealed_points`-də qalır.
+
+### ADR-002: Mənbə: e-qanun.az-dakı konsolidasiya olunmuş HTML
+- Qərar: `https://frameworks.e-qanun.az/46/f_46943.html` (UI: `https://e-qanun.az/framework/46943`),
+  Ədliyyə Nazirliyinin rəsmi hüquqi aktlar bazası; bütün dəyişikliklər daxil edilmiş cari mətn.
+  `make data` faylı xam bayt kimi saxlayır, `.meta.json`-da URL, download tarixi, sha256,
+  `Last-Modified` qeyd olunur.
+- Alternativlər: rəsmi qəzet (Azərbaycan qəzeti / Qanunvericilik Toplusu) PDF-ləri — dəyişikliklər
+  ayrı-ayrı aktlardadır, konsolidasiya bizim işimiz olardı; üçüncü tərəf saytlarındakı surətlər —
+  aktuallığı və dəqiqliyi zəmanətsiz; e-qanun.az-ın JS API-si — sənədləşdirilməyib, dəyişə bilər.
+- Niyə: rəsmi, konsolidasiya olunmuş, bir statik fayl; `<s>` ilə çıxarılmış mətn işarələnib (ADR-001),
+  struktur (bölmə/fəsil/maddə/bənd) deterministik parse olunur.
+- Risk: istifadə şərtləri saytda göstərilməyib. Ona görə tam mətn repo-da yayılmır (`data/` git-ignored),
+  yalnız kiçik test fixture-ı commit olunur; README mənbəni və download tarixini göstərir.
+- Nəticə (2026-10-05 download, `Last-Modified: 17 Sep 2026`): 329 maddə başlığı (1-317 + 12 tireli),
+  327-si qüvvədə (241, 298 tamamilə xətli); 5 "ləğv edilmişdir" bəndi.
+
+### ADR-003: Chunking: maddənin hər top-level bəndi bir chunk
+- Qərar: `ingest/chunk.py`. Top-level bənd: `2.`, `2-1.`, və maddə nömrəsi prefiksli `7-1.1.`
+  (yalnız prefiks dəqiq `<maddə_no>.` olduqda və ardınca rəqəm gəldikdə silinir). Dərin bəndlər
+  (`7-1.1.1.`, `2-3.1.`), hərfli yarımbəndlər (`a)` … `ç)`), nömrəsiz siyahı sətirləri və maddənin
+  sonundakı `Qeyd:` öz bəndinin içində qalır. Nömrəli bəndi olmayan maddə — bir chunk.
+  "Ləğv edilmişdir" bəndləri chunk vermir. `chunk_id` = `<maddə>.<bənd>` (`114.2`, `3.2-1`) və ya
+  `<maddə>`; bənd nömrəsi mətndən götürülür, sıra ilə verilmir (xətli bəndlər sıranı pozur: 179-da
+  yalnız `2.` qalıb). Hər chunk `Maddə <no>. <başlıq>` header-i ilə başlayır.
+- Alternativlər: bütöv maddə bir chunk (max 7 115 simvol, bir neçə mövzu bir vektorda qarışır,
+  `Maddə 114.2` dəqiqliyində istinad mümkün olmur); sabit ölçülü (token) pəncərələr — bəndləri
+  kəsir, istinad sərhədləri itir; hər abzas/yarımbənd ayrıca — `a)` sətri girişsiz mənasızdır.
+- Niyə: bənd hüquqi istinadın təbii vahididir (`Maddə 114.2`), citation yoxlaması və golden set
+  eyni vahidlə işləyir; deterministik, LLM-siz; header bəndi tək götürüləndə də kontekst verir.
+  `Qeyd:` hər chunk-a kopyalanmır (12 maddə, sadəlik); lazım olsa Phase 4-də ölçülür.
+- Nəticə (tam mətn): 327 maddə → **988 chunk** (76 maddə tək chunk), ID-lər unikal, hər maddənin
+  ən az bir chunk-ı var. Ölçü (header daxil, simvol): min 99, p50 326, p95 880, p99 1 860,
+  max 3 339; 7 chunk > 2 000 (179.2, 9, 31.2, 12.1, 74.1, 209, 130) — hamısı uzun `a)…` siyahılarıdır.
+- Açıq təklif (əlavə edilməyib): 2 000 simvoldan uzun hərfli siyahını giriş cümləsini təkrarlayaraq
+  qruplara bölmək. Phase 4-də bu chunk-ların retrieval nəticəsinə görə qərar veriləcək.
