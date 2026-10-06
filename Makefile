@@ -10,7 +10,7 @@ data:
 	uv run python -m labor_code_rag.ingest.download
 
 ingest:
-	@echo "make ingest: not implemented yet (Phase 1)"; exit 1
+	uv run python -m labor_code_rag.ingest.chunk
 
 app:
 	@echo "make app: not implemented yet (Phase 2)"; exit 1

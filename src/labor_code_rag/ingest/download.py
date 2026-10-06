@@ -66,6 +66,14 @@ def urllib_fetch(url: str, timeout_s: float) -> FetchResult:
         raise SourceDownloadError(f"cannot reach {url}: {exc}") from exc
 
 
+def raw_html_path(source_url: str, raw_dir: Path) -> Path:
+    """Where the downloaded HTML lives: ``raw_dir`` + the URL's file name."""
+    name = PurePosixPath(urlparse(source_url).path).name
+    if not name:
+        raise SourceDownloadError(f"cannot derive a file name from {source_url}")
+    return raw_dir / name
+
+
 def _write_atomic(path: Path, data: bytes) -> None:
     """Write to a temp file, then rename: readers never see a half-written file."""
     tmp = path.with_name(path.name + ".tmp")
@@ -82,9 +90,7 @@ def download_source(
     now: Callable[[], datetime] = lambda: datetime.now(UTC),
 ) -> SourceMeta:
     """Fetch ``source_url`` into ``raw_dir`` as raw bytes plus a ``.meta.json`` sidecar."""
-    name = PurePosixPath(urlparse(source_url).path).name
-    if not name:
-        raise SourceDownloadError(f"cannot derive a file name from {source_url}")
+    html_path = raw_html_path(source_url, raw_dir)
 
     started = time.perf_counter()
     result = fetch(source_url, timeout_s)
@@ -103,7 +109,6 @@ def download_source(
     )
 
     raw_dir.mkdir(parents=True, exist_ok=True)
-    html_path = raw_dir / name
     meta_path = html_path.with_suffix(".meta.json")
     # Drop the previous run's marker first, so a stale meta.json never sits next to new HTML.
     meta_path.unlink(missing_ok=True)

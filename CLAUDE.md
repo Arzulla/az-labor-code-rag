@@ -113,6 +113,7 @@ Analogy for the owner: SLF4J + MDC → stdlib `logging` + `contextvars`.
 | `answer.refused` | INFO | `reason` |
 | `request.completed` | INFO | `total_latency_ms`, `total_cost_usd`, `cited_articles` |
 | `source.downloaded` | INFO | `size_bytes`, `sha256`, `last_modified`, `latency_ms` |
+| `ingest.completed` | INFO | `articles`, `chunks`, `repealed_points`, `latency_ms` |
 | `request.failed` | ERROR | `error_type`, `stage` (with stack trace) |
 
 **Levels:** DEBUG = payloads (question, rewritten query, prompts); INFO = one line per

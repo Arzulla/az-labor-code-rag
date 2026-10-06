@@ -25,6 +25,7 @@ class DataSettings(BaseModel):
     source_url: str
     ui_url: str
     raw_dir: Path = Path("data/raw")
+    processed_dir: Path = Path("data/processed")
     download_timeout_s: float = 60.0
 
 
