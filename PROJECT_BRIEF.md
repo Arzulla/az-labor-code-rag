@@ -115,3 +115,13 @@ Format: **Qərar → Alternativlər → Niyə → Ölçülən nəticə.**
 - Alternativ: GitLab Handbook üzərində permission-aware RAG
 - Niyə: domeni başa düşmədən golden set-i keyfiyyətlə yazmaq və cavabları yoxlamaq mümkün deyil
 - Nəticə: layihə yeni repo-da sıfırdan başladı; scaffolding və mühəndislik qaydaları saxlanıldı
+
+### ADR-001: Üstündən xətt çəkilmiş (`<s>`) mətn parse zamanı atılır
+- Qərar: rəsmi HTML-də dəyişikliklərlə çıxarılmış mətn silinmir, `<s>` ilə xətli
+  saxlanılır. Parser bu mətni atır; tamamilə xətli maddələr (241, 298) nəticəyə düşmür.
+- Alternativlər: xətli mətni saxlamaq; çıxarılmış maddələri `repealed: bool` field ilə saxlamaq
+- Niyə: xətli mətn qüvvədə olan qanun deyil. Saxlansa, assistent onu sitat gətirər
+  (grounding qaydası, CLAUDE.md §4). Ayrıca field model-i mürəkkəbləşdirir; "298-ci maddə"
+  sualına cavab isə Phase 5-də refusal kimi yoxlanıla bilər.
+- Nəticə: qanun body-sində 140 `<s>` tag; 329 əvəzinə 327 maddə (1-317 + 12 tireli,
+  241 və 298 çıxmaqla); "ləğv edilmişdir" bəndləri (5 ədəd) ayrıca `repealed_points`-də qalır.
