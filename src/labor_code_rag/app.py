@@ -1,6 +1,7 @@
 """Gradio UI (``make app``): one question in, one grounded answer out. Single-turn."""
 
 import logging
+import re
 
 import chromadb
 import gradio as gr
@@ -47,7 +48,8 @@ def format_sources(result: AnswerResult) -> str:
     """Retrieved chunks with rank and cosine score, for the collapsed panel."""
     blocks = []
     for c in result.retrieved:
-        body = c.text.replace("\n", "\n> ")
+        # "1. Mətn" would render as a markdown list item and renumber; escape the dot.
+        body = re.sub(r"^(\d+(?:-\d+)?)\.", r"\1\\.", c.text, flags=re.M).replace("\n", "\n> ")
         blocks.append(f"**{c.rank}. {c.chunk_id}** · score {c.score:.3f}\n\n> {body}")
     footer = f"`request_id={result.request_id}` · {result.latency_ms} ms · ${result.cost_usd:.5f}"
     return "\n\n".join([*blocks, footer])
@@ -63,13 +65,14 @@ def build_app(llm: LLMClient, collection: Collection, k: int) -> gr.Blocks:
             raise gr.Error(f"Xəta baş verdi, yenidən cəhd edin (id: {get_request_id()}).") from exc
         return format_answer(result), format_sources(result)
 
-    app = gr.Blocks(title="Əmək Məcəlləsi köməkçisi")
+    # analytics_enabled=False: Gradio otherwise sends usage telemetry to Hugging Face.
+    app = gr.Blocks(title="Əmək Məcəlləsi köməkçisi", analytics_enabled=False)
     with app:
         gr.Markdown(
             "# Əmək Məcəlləsi köməkçisi\nAzərbaycan Respublikasının Əmək Məcəlləsi üzrə sual verin."
         )
         gr.Markdown(DISCLAIMER)
-        question = gr.Textbox(label="Sual", lines=2, placeholder="Məs.: " + EXAMPLES[0])
+        question = gr.Textbox(label="Sual", lines=1, placeholder="Məs.: " + EXAMPLES[0])
         button = gr.Button("Soruş", variant="primary")
         answer = gr.Markdown()
         with gr.Accordion("Tapılan maddələr və score-lar", open=False):
@@ -85,6 +88,7 @@ def main() -> None:
     configure_logging(
         settings.logging.level, settings.logging.format, settings.logging.log_payloads
     )
+    logging.getLogger("httpx").setLevel(logging.WARNING)  # Gradio's own HTTP chatter
     if settings.llm is None:
         raise LLMError("missing 'llm' section in config.yaml")
     # Clients are created once here and passed down (no module-level clients).
