@@ -92,7 +92,7 @@ hər konfiqurasiya ən az 2 dəfə; golden set nəticəni yaxşılaşdırmaq ü�
 
 - [x] **0. Scaffolding:** struktur, config, logging, lint, test
 - [x] **1. Data:** mənbə və istifadə şərtləri, parse, maddə chunking, testlər (~5 saat)
-- [ ] **2. Baseline:** yalnız vector search (1 encoder) + cavab + istinad + sadə UI (~4 saat)
+- [x] **2. Baseline:** yalnız vector search (1 encoder) + cavab + istinad + sadə UI (~4 saat)
 - [ ] **3. Golden set + eval:** 60-80 sual, baseline nəticəsi (~6 saat)
 - [ ] **4. Eksperimentlər:** encoder müqayisəsi → hybrid → rerank → rewriting, hər biri ayrıca (~7 saat)
 - [ ] **5. Grounding:** citation yoxlaması, refusal, injection testləri (~3 saat)
@@ -160,3 +160,66 @@ Format: **Qərar → Alternativlər → Niyə → Ölçülən nəticə.**
   max 3 339; 7 chunk > 2 000 (179.2, 9, 31.2, 12.1, 74.1, 209, 130) — hamısı uzun `a)…` siyahılarıdır.
 - Açıq təklif (əlavə edilməyib): 2 000 simvoldan uzun hərfli siyahını giriş cümləsini təkrarlayaraq
   qruplara bölmək. Phase 4-də bu chunk-ların retrieval nəticəsinə görə qərar veriləcək.
+
+### ADR-004: Model provider: yalnız OpenAI, modellər `config.yaml`-da pin olunub
+- Qərar: embedding `text-embedding-3-small`, cavab `gpt-4.1-mini-2025-04-14`, judge
+  `gpt-4.1-2025-04-14` (SABİT, Phase 3-dən etibarən dəyişdirilmir). Hər üçü 2026-10-06-da
+  `models.list()` ilə yoxlanılıb; heç biri deprecations siyahısında deyil. Qiymətlər ($/1M token,
+  input/output): 0.02 / —, 0.40 / 1.60, 2.00 / 8.00 — `config.yaml`-dakı price table-dan
+  `cost_usd` hesablanır (cached-input endirimi nəzərə alınmır, yəni rəqəm yuxarı həddir).
+  `llm.py` `openai` SDK-nı konfiqurasiya olunan `base_url` ilə işlədir; SDK retry-ları söndürülüb
+  (`max_retries=0`), retry siyasəti yalnız `tenacity`-dədir (429, 5xx, timeout, connection;
+  exponential backoff + jitter; auth/validation xətaları dərhal `LLMError`).
+- Alternativlər: Ollama/lokal modellər (pulsuz, amma Azərbaycan dilində keyfiyyət və structured
+  output zəmanəti zəif, Mac-da latency yüksək; scope-dan kənar); digər API-lər (Anthropic, Gemini —
+  ikinci açar və ikinci SDK, Phase 2 üçün fayda yoxdur); `gpt-5-mini` (daha ucuz input, amma
+  reasoning modelidir, `temperature` dəyişdirilə bilmir — judge üçün `temperature=0` tələbimizə
+  (CLAUDE.md §5) uyğun deyil); `gpt-4o-mini` (daha ucuz, Azərbaycan dilində daha zəif);
+  `text-embedding-3-large` və bge-m3 — Phase 4 müqayisəsi.
+- Niyə: bir provider, bir açar, structured outputs, ucuz baseline. `base_url` sayəsində
+  OpenAI-compatible lokal provider Phase 4-də kod dəyişmədən qoşula bilər.
+- Məlum risklər: (1) **judge və cavab modeli eyni ailədəndir (GPT-4.1)** — self-preference bias
+  mümkündür: judge öz ailəsinin üslubunu yüksək qiymətləndirə bilər. İndilik qəbul edirik, çünki
+  layihə OpenAI-only-dir və judge üçün `temperature=0` lazımdır; Phase 3-də judge balları əl ilə
+  yoxlanmış nümunə ilə kalibrə olunacaq, nəticələr README-də bu qeydlə veriləcək. (2) Eyni ailədən
+  `gpt-4.1-nano` 2026-10-23-də bağlanır — ailə həyat dövrünün sonundadır; judge dəyişsə, bütün
+  judge balları yenidən hesablanmalıdır (ADR ilə).
+- Ölçülən nəticə: index 988 chunk → **$0.0043** (~213k token, 10.9 s); təkrar `make index` —
+  0 embedding çağırışı (988 cache hit). Sorğu başına ~$0.0006–0.0011, latency 1.3–5 s
+  (smoke run, Phase 2 PR). Phase 2-nin ümumi xərci ≈ **$0.02** ($2 büdcədən).
+
+### ADR-005: Chroma persistent + cosine + embedding modeli başına bir collection; prompt və istinad formatı
+- Qərar:
+  - Chroma `PersistentClient` (`data/chroma`), collection adı modeli daxil edir
+    (`labor_code__text-embedding-3-small`), distance **cosine** explicit verilir (Chroma-nın
+    default-u L2-dir) və açılışda yoxlanılır. Embedding-ləri özümüz ötürürük
+    (`embedding_function=None`). Upsert `chunk_id` ilə — idempotent; `chunks.jsonl`-dan itən
+    chunk-lar silinir. Metadata-da `point=None` `""` kimi saxlanılır (Chroma `None` qəbul etmir).
+  - Embedding cache: SQLite, açar `(embedding_model, sha256(text))`.
+  - Prompt (`answer-v1`): Azərbaycan dilində system prompt; hər chunk
+    `<article id="114.2" title="...">…</article>` içində, mətn və atributlar `html.escape` olunur —
+    chunk-dakı `</article>` delimiter-i bağlaya bilmir; içindəki göstərişlərə əməl etməmək qaydası.
+    Structured output `Answer {text, citations[], refused}`; `refused=true` olduqda `citations`
+    boş olmalıdır (schema validator), mətn sabit refusal cümləsi ilə əvəz olunur.
+  - İstinad yoxlaması generasiyadan **sonra**: mətndəki ref-lər `text.parse_article_refs` ilə
+    (`114-cü maddə` daxil) + structured `citations` siyahısı; retrieve olunmuş set ilə müqayisə.
+    Qayda **qəsdən yumşaqdır**: `Maddə N` — N-in hər hansı chunk-ı retrieve olunubsa etibarlıdır;
+    `Maddə N.P` — `N.<P-nin top-level hissəsi>` və ya bütöv maddə chunk-ı retrieve olunubsa.
+    Etibarsızlar `citation.invalid` (`level`: article/point) kimi loglanır və cavabla qaytarılır.
+    Point səviyyəsində dəqiqlik Phase 3-də ölçüləcək.
+- Alternativlər: L2 (OpenAI embedding-ləri normallaşdırılıb, sıralama eyni olardı, amma score
+  [0,1] cosine similarity kimi şərh olunmur və başqa encoder-lərdə (Phase 4) fərq yarana bilər);
+  bir collection-da bir neçə model (vektorlar müxtəlif fəzalardadır, qarışdırmaq olmaz);
+  vector DB server (Qdrant/Weaviate — scope-dan kənar, 988 vektor üçün lazımsız);
+  istinadları yalnız prompt ilə "tələb etmək" (yoxlama olmadan model uydurma istinad verə bilər);
+  sərt point-level yoxlama (baseline-da çox false-positive; əvvəl ölçmək lazımdır).
+- Niyə: lokal, serversiz, reproducible; model dəyişikliyi yeni collection + cache açarı ilə
+  təhlükəsizdir; istinad yoxlaması grounding qaydasının (CLAUDE.md §4) ölçülə bilən hissəsidir.
+- Ölçülən nəticə (smoke run, 5 sual, k=8, iki dəfə): **etibarsız istinad 0**; out-of-scope sual
+  (gəlir vergisi) rədd edildi. Amma 4 in-scope sualdan 3-ü rədd edildi, 1-i natamam cavablandı —
+  səbəb retrieval-dır, generasiya deyil: düzgün chunk top-8-də yoxdur (114.2 "21 təqvim günü" —
+  "minimum" sözü 155 "minimum əmək haqqı"-nı gətirir; "114-cü maddə" — dense search nömrəni
+  tutmur; "qovdular" — danışıq dili; hamilə → 79.1 yox, 240–245). Model kontekstdən kənara
+  çıxmadı. Bu, Phase 4 (BM25/hybrid, query rewriting, maddə nömrəsi ilə birbaşa lookup) üçün
+  əsas motivasiyadır; rəqəmlər Phase 3-də golden set ilə ölçüləcək.
+

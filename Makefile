@@ -1,4 +1,4 @@
-.PHONY: setup data ingest app test lint eval
+.PHONY: setup data ingest index app smoke test lint eval
 
 LABEL ?=
 SPLIT ?= dev
@@ -12,8 +12,15 @@ data:
 ingest:
 	uv run python -m labor_code_rag.ingest.chunk
 
+index:
+	uv run python -m labor_code_rag.ingest.index
+
 app:
-	@echo "make app: not implemented yet (Phase 2)"; exit 1
+	uv run python -m labor_code_rag.app
+
+# 5 hand-picked questions against the real API (~$0.01); not an eval (Phase 3).
+smoke:
+	uv run python scripts/smoke_run.py
 
 test:
 	uv run pytest

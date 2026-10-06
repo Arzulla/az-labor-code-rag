@@ -109,11 +109,12 @@ Analogy for the owner: SLF4J + MDC → stdlib `logging` + `contextvars`.
 | `rerank.completed` | INFO | `input_n`, `output_n`, `top_article_nos`, `latency_ms` |
 | `llm.called` | INFO | `purpose`, `model`, `prompt_version`, `prompt_tokens`, `completion_tokens`, `cost_usd`, `latency_ms`, `attempt` |
 | `llm.retry` | WARNING | `purpose`, `error_type`, `attempt`, `wait_s` |
-| `citation.invalid` | WARNING | `cited`, `retrieved_article_nos` |
+| `citation.invalid` | WARNING | `cited`, `level` (article/point), `retrieved_article_nos` |
 | `answer.refused` | INFO | `reason` |
 | `request.completed` | INFO | `total_latency_ms`, `total_cost_usd`, `cited_articles` |
 | `source.downloaded` | INFO | `size_bytes`, `sha256`, `last_modified`, `latency_ms` |
 | `ingest.completed` | INFO | `articles`, `chunks`, `repealed_points`, `latency_ms` |
+| `index.completed` | INFO | `chunks`, `embedded`, `cache_hits`, `deleted`, `model`, `collection`, `cost_usd`, `latency_ms` |
 | `request.failed` | ERROR | `error_type`, `stage` (with stack trace) |
 
 **Levels:** DEBUG = payloads (question, rewritten query, prompts); INFO = one line per
@@ -159,5 +160,6 @@ and report the results.
 
 ## 12. Commands
 
-- `make setup` · `make data` · `make ingest` · `make app` · `make test` · `make lint`
+- `make setup` · `make data` · `make ingest` · `make index` · `make app` · `make test` · `make lint`
+- `make smoke` (Phase 2 smoke run, real API) · `uv run pytest -m integration`
 - `make eval LABEL=<name> SPLIT=dev`
